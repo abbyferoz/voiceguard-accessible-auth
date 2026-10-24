@@ -27,7 +27,7 @@ Open http://localhost:3000. The page you land on links to:
 | Page | Role |
 |---|---|
 | `/pc.html` | Participant's computer: mail, bank sign-in, and spoken output |
-| `/phone.html` | Participant's phone: push approvals. Open it on a real phone on the same Wi-Fi (the server prints the address) to use VoiceOver or TalkBack. |
+| `/phone.html` | Participant's phone: push approvals. In VoiceGuard mode every waiting request is listed under its own heading, new requests are queued (never cut off), and **Read all waiting requests**, **Repeat this request** and **Stop reading** let the user re-hear them. Open it on a real phone on the same Wi-Fi (the server prints the address) to use VoiceOver or TalkBack. |
 | `/attacker.html` | Send look-alike emails, arm a concurrent-login race, spam pushes |
 | `/study.html` | Experimenter: participant ID, AB/BA counterbalancing, 6 scripted tasks per block, SUS and NASA-TLX, CSV export |
 | `/results.html` | Automated evaluation and study results, baseline against VoiceGuard |
@@ -52,7 +52,9 @@ Headline results (`eval/results/phishing_results.md`, `push_results.md`):
 
 ## Study data
 
-Everything is logged to `data/` (git-ignored): `events.jsonl`, `results.jsonl` (one auto-scored row per task) and `questionnaires.jsonl`. Download them as CSV from the experimenter page.
+Everything is logged to `data/` (git-ignored; start with `DATA_DIR=data/practice npm start` to keep practice runs separate): `events.jsonl`, `results.jsonl` (one auto-scored row per task) and `questionnaires.jsonl`. Download them as CSV from the experimenter page.
+
+Step-by-step guides for the group are in [`../docs/`](../docs/): running the app, running the experiment, and making changes.
 
 ## Layout
 

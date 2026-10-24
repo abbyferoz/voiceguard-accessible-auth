@@ -135,6 +135,7 @@ Following our report's advice, we treat concurrent login and fatigue as **one pu
 3. **Spoken code word.** When the user signs in, the computer says *"Your code word is FALCON. Only approve a request that says FALCON."* Each push speaks its own word, so the attacker's request says something else, such as *"BRIDGE"*. The paper notes that attackers can copy device and city. They cannot know the code word, so it still separates the two requests when everything else matches.
 4. **Concurrency alert.** *"Caution: 2 sign-in requests are waiting at the same time. Only one can be yours. Approve only the one whose code word matches your computer."* Requests from an unfamiliar device are also flagged.
 5. **Report button.** Every push can be reported as "this wasn't me".
+6. **Nothing is missed by ear.** When several requests arrive, each one is read in full, oldest first, instead of the newest cutting off the previous one. Every request has its own heading so screen-reader users can jump between them, and **Read all waiting requests**, **Repeat this request** and **Stop reading** let the user hear them again. Focus moves to the new request's heading, never straight onto Approve, so one accidental tap cannot approve a request the user has not heard.
 
 ## 3.5 Solving Problem 3: Notification fatigue (the push guard)
 
