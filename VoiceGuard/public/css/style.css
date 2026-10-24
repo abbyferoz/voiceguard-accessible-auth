@@ -129,7 +129,7 @@ dialog .inner { padding: 20px; border-top: 8px solid var(--danger); }
 .phone-screen { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
 .push { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: var(--surface); box-shadow: 0 2px 10px rgba(0,0,0,.08); }
 .push.danger { border: 2px solid var(--danger); }
-.push .svc { font-weight: 800; font-size: 1.1rem; }
+.push .svc { font-weight: 800; font-size: 1.1rem; margin: 0 0 .25em; }
 .push dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 8px 0; font-size: .9rem; }
 .push dt { color: var(--ink-2); }
 .push dd { margin: 0; font-weight: 600; }

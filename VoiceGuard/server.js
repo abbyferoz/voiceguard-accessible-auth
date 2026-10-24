@@ -19,7 +19,7 @@ const PushGuard = require('./public/js/push-guard.js');
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC = path.join(__dirname, 'public');
-const DATA = path.join(__dirname, 'data');
+const DATA = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(__dirname, 'data');
 fs.mkdirSync(DATA, { recursive: true });
 
 // ---------------------------------------------------------------------------

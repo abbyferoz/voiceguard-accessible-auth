@@ -100,26 +100,58 @@ const VG = (() => {
     while (box.children.length > 40) box.lastChild.remove();
   }
 
+  // interrupt: true  → stop whatever is being said and say this now
+  // interrupt: false → say this after everything already queued
+  const pendingTimers = new Set();
+
+  function later(fn, ms) {
+    const id = setTimeout(() => { pendingTimers.delete(id); fn(); }, ms);
+    pendingTimers.add(id);
+  }
+
+  function announceLive(text, o) {
+    // Interrupting messages go to the assertive region; queued ones are appended to the
+    // polite region so the screen reader reads them in order instead of dropping earlier ones.
+    const live = document.getElementById(o.interrupt && o.level === 'danger' ? 'live-assertive' : 'live-polite');
+    if (!live) return;
+    if (o.interrupt) live.textContent = '';
+    later(() => {
+      const p = document.createElement('p');
+      p.textContent = text;
+      live.appendChild(p);
+      while (live.children.length > 6) live.firstChild.remove();
+    }, 60);
+  }
+
   function speak(text, opts) {
     const o = { interrupt: true, earcon: null, level: '', ...(opts || {}) };
     if (!text) return;
+    if (o.interrupt) stopSpeech();
     transcript(text, o.level);
     const mode = voiceMode();
     const delay = o.earcon ? earcon(o.earcon) : 0;
-    if (mode === 'sr' || mode === 'both') {
-      const live = document.getElementById(o.level === 'danger' ? 'live-assertive' : 'live-polite');
-      if (live) { live.textContent = ''; setTimeout(() => { live.textContent = text; }, 60); }
-    }
+    if (mode === 'sr' || mode === 'both') announceLive(text, o);
     if ((mode === 'tts' || mode === 'both') && 'speechSynthesis' in window) {
-      if (o.interrupt) speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = state ? state.config.speechRate : 1;
-      u.lang = 'en-US';
-      setTimeout(() => speechSynthesis.speak(u), delay);
+      // Chrome's voices stop after roughly 15 s of continuous speech, so long
+      // announcements are queued sentence by sentence.
+      const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+      later(() => {
+        for (const s of sentences) {
+          if (!s.trim()) continue;
+          const u = new SpeechSynthesisUtterance(s.trim());
+          u.rate = state ? state.config.speechRate : 1;
+          u.lang = 'en-US';
+          speechSynthesis.speak(u);
+        }
+      }, delay);
     }
   }
 
-  function stopSpeech() { if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+  function stopSpeech() {
+    for (const id of pendingTimers) clearTimeout(id);
+    pendingTimers.clear();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+  }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

@@ -35,6 +35,7 @@
     <div class="phone-status" aria-hidden="true"><span id="clock">--:--</span><span>5G ▮▮▮</span></div>
     <div class="phone-screen">
       <h1 style="font-size:1.1rem">Authenticator</h1>
+      <div id="toolbar" class="row"></div>
       <div id="pushes"></div>
       <div id="activity"></div>
     </div>
@@ -54,11 +55,13 @@
 <script>
 (() => {
   const box = document.getElementById('pushes');
+  const toolbar = document.getElementById('toolbar');
   const activity = document.getElementById('activity');
   const esc = VG.esc;
   const announced = new Set();
   const warnedLow = new Set();
   let changePasswordUntil = 0;
+  let lastSignature = '';
 
   const S = () => VG.state;
   const isGuard = () => S() && S().config.condition === 'guard';
@@ -72,43 +75,57 @@
       { rate: S().config.speechRate, knownDevices: [PushGuard.deviceKey(S().victimDevice)] }, components());
   }
   const secondsLeft = (p) => Math.max(0, Math.round((p.expiresAt - VG.now()) / 1000));
+  const pendingPushes = () => S().pushes.filter((p) => p.status === 'pending').sort((a, b) => a.createdAt - b.createdAt);
 
   function visiblePushes() {
-    const pending = S().pushes.filter((p) => p.status === 'pending').sort((a, b) => a.createdAt - b.createdAt);
+    const pending = pendingPushes();
     if (isGuard()) return pending;
     // Deployed apps: the newest notification replaces the older one.
     return pending.length ? [pending[pending.length - 1]] : [];
   }
 
-  function card(p) {
+  function card(p, index, total) {
     const guard = isGuard();
     const a = guard ? assess(p) : null;
     const c = components();
-    const warnings = a ? a.warnings.map((w) => `<div class="banner ${w.level}" role="alert"><strong>${w.type === 'fatigue' ? 'Possible push-fatigue attack' : w.type === 'concurrent' ? 'More than one request' : 'New device'}</strong>${esc(w.text)}</div>`).join('') : '';
+    // Warnings are spoken by the announcer, so they are not live regions here:
+    // a role="alert" would be re-read every time the list is redrawn.
+    const warnings = a ? a.warnings.map((w) => `<div class="banner ${w.level}"><strong>${w.type === 'fatigue' ? 'Possible push-fatigue attack' : w.type === 'concurrent' ? 'More than one request' : 'New device'}</strong>${esc(w.text)}</div>`).join('') : '';
     const details = guard && c.context ? `
       <dl>
         <dt>From</dt><dd>${esc(PushGuard.deviceLabel(p.device))}</dd>
         <dt>Near</dt><dd>${esc(p.device ? p.device.location : 'unknown')}</dd>
         <dt>Started</dt><dd>${new Date(p.createdAt).toLocaleTimeString()}</dd>
-        ${a.pendingCount > 1 ? `<dt>Request</dt><dd>${a.pendingCount} waiting</dd>` : ''}
       </dl>` : '';
     const code = guard && c.codeWord ? `<p>Code word: <span class="code-word" style="font-size:1.3rem">${esc(p.codeWord)}</span></p>` : '';
     const locked = a && a.locked;
     const approveLabel = guard ? 'Approve' : 'Yes';
     const denyLabel = guard ? 'Deny' : 'No, it’s not me';
+    const heading = guard && total > 1 ? `${esc(p.service)}, request ${index + 1} of ${total}` : esc(p.service);
     return `
       <article class="push ${a && a.level === 'danger' ? 'danger' : ''}" aria-labelledby="t-${p.id}" data-id="${p.id}">
-        <div class="svc" id="t-${p.id}">${esc(p.service)}</div>
+        <h2 class="svc" id="t-${p.id}" tabindex="-1">${heading}</h2>
         <p>${guard && c.context ? 'Sign-in request' : 'Are you trying to sign in?'}</p>
         ${details}${code}${warnings}
         <div class="actions">
           <button class="primary" data-act="approve" data-key="${p.id}-approve" ${locked ? 'aria-disabled="true"' : ''}>${approveLabel}${locked ? ' (locked)' : ''}</button>
           <button data-act="deny" data-key="${p.id}-deny">${denyLabel}</button>
           ${guard ? `<button class="report danger" data-act="report" data-key="${p.id}-report">Report: this wasn’t me</button>` : ''}
-          ${guard ? `<button class="report" data-act="repeat" data-key="${p.id}-repeat">Repeat details</button>` : ''}
+          ${guard ? `<button class="report" data-act="repeat" data-key="${p.id}-repeat">Repeat this request</button>` : ''}
         </div>
         <div class="timer" data-timer="${p.id}">${secondsLeft(p)} seconds left</div>
       </article>`;
+  }
+
+  // Everything that changes what is drawn. Redrawing only when it changes keeps a
+  // screen reader's reading position instead of resetting it on every server update.
+  function signature() {
+    const pend = pendingPushes();
+    return JSON.stringify([
+      S().config.condition, S().config.components, Date.now() < changePasswordUntil,
+      S().pushes.map((p) => p.id + p.status),
+      isGuard() ? pend.map((p) => assess(p).locked) : [],
+    ]);
   }
 
   function render() {
@@ -117,18 +134,32 @@
     cond.textContent = isGuard() ? 'VoiceGuard on' : 'Baseline';
     cond.className = 'pill ' + S().config.condition;
 
+    const sig = signature();
+    if (sig !== lastSignature) {
+      lastSignature = sig;
+      draw();
+    }
+    announceNew();
+  }
+
+  function draw() {
     const focusedKey = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key : null;
+    const focusedHeading = document.activeElement && document.activeElement.tagName === 'H2' ? document.activeElement.id : null;
     const list = visiblePushes();
-    let html = list.map(card).join('');
+    let html = list.map((p, i) => card(p, i, list.length)).join('');
     if (!isGuard() && !list.length && Date.now() < changePasswordUntil) {
       // Google Push on VoiceOver: after a denial the user is sent to a password change,
       // in the same place where the next (attacker) prompt will appear.
-      html = `<article class="push"><div class="svc">Secure your account</div>
+      html = `<article class="push"><h2 class="svc">Secure your account</h2>
         <p>If this wasn’t you, change your password now.</p>
         <div class="actions"><button class="primary" data-act="change-password" data-key="cp">Change password</button>
         <button data-act="dismiss" data-key="cp-dismiss">Not now</button></div></article>`;
     }
     box.innerHTML = html || '<p class="empty">No sign-in requests</p>';
+
+    toolbar.innerHTML = isGuard() && list.length ? `
+      <button data-tool="read-all">Read all waiting requests (${list.length})</button>
+      <button data-tool="stop">Stop reading</button>` : '';
 
     if (isGuard()) {
       const recent = S().pushes.filter((p) => p.status !== 'pending').slice(-5).reverse();
@@ -136,30 +167,51 @@
         recent.map((p) => `<li>${esc(p.service)} · ${esc(PushGuard.deviceLabel(p.device))} · ${esc(p.status)}</li>`).join('')}</ul>` : '';
     } else activity.innerHTML = '';
 
-    if (focusedKey) {
-      const el = box.querySelector(`[data-key="${focusedKey}"]`);
-      if (el) el.focus();
-    }
-    announceNew(list);
+    const restore = (focusedKey && box.querySelector(`[data-key="${focusedKey}"]`)) ||
+      (focusedHeading && document.getElementById(focusedHeading));
+    if (restore) restore.focus();
   }
 
-  function announceNew(list) {
-    const pending = S().pushes.filter((p) => p.status === 'pending');
-    const fresh = pending.filter((p) => !announced.has(p.id));
+  function announceNew() {
+    const fresh = pendingPushes().filter((p) => !announced.has(p.id));
     if (!fresh.length) return;
     fresh.forEach((p) => announced.add(p.id));
     if (isGuard()) {
-      const p = fresh[fresh.length - 1];
-      const a = assess(p);
-      VG.speak(a.announcement, { earcon: a.level === 'danger' ? 'danger' : 'notify', level: a.level === 'danger' ? 'danger' : '' });
-      if (a.warnings.length) VG.log('guard_warning', { where: 'push', pushId: p.id, warnings: a.warnings.map((w) => w.type), locked: a.locked });
+      // Queue every new request after whatever is being said, oldest first,
+      // so no request is cut off or skipped.
+      if (fresh.length > 1) VG.speak(`${fresh.length} new sign-in requests.`, { interrupt: false, earcon: 'danger', level: 'danger' });
+      fresh.forEach((p, i) => {
+        const a = assess(p);
+        const danger = a.level === 'danger';
+        VG.speak(a.announcement, { interrupt: false, earcon: fresh.length === 1 ? (danger ? 'danger' : 'notify') : null, level: danger ? 'danger' : '' });
+        if (a.warnings.length) VG.log('guard_warning', { where: 'push', pushId: p.id, warnings: a.warnings.map((w) => w.type), locked: a.locked });
+      });
     } else {
+      const list = visiblePushes();
       const p = list[list.length - 1];
       if (p) VG.speak(PushGuard.baselineAnnouncement(p), { earcon: 'notify' });
     }
-    const first = box.querySelector('[data-act="approve"], [data-act="change-password"]');
-    if (first && !box.contains(document.activeElement)) first.focus();
+    // Move focus to the request heading, never straight onto Approve: one tap
+    // on a focused Approve button would approve a request the user has not heard.
+    if (!box.contains(document.activeElement)) {
+      const h = document.getElementById(`t-${fresh[0].id}`) || box.querySelector('h2');
+      if (h) h.focus();
+    }
   }
+
+  function readAll() {
+    const list = visiblePushes();
+    if (!list.length) return VG.speak('No sign-in requests.');
+    VG.speak(`${list.length} sign-in request${list.length === 1 ? '' : 's'} waiting.`);
+    list.forEach((p) => VG.speak(assess(p).announcement, { interrupt: false }));
+  }
+
+  toolbar.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-tool]');
+    if (!btn) return;
+    if (btn.dataset.tool === 'read-all') { VG.log('read_all_requests', {}); readAll(); }
+    if (btn.dataset.tool === 'stop') VG.stopSpeech();
+  });
 
   box.addEventListener('click', async (e) => {
     const btn = e.target.closest('button[data-act]');
@@ -174,31 +226,36 @@
     if (act === 'dismiss') { changePasswordUntil = 0; return render(); }
     const id = btn.closest('[data-id]').dataset.id;
     const push = S().pushes.find((p) => p.id === id);
-    if (act === 'repeat') return VG.speak(assess(push).announcement);
+    if (act === 'repeat') { VG.log('repeat_request', { pushId: id }); return VG.speak(assess(push).announcement); }
     if (btn.getAttribute('aria-disabled') === 'true') {
       VG.log('locked_approve_attempt', { pushId: id });
       return VG.speak('Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report.', { level: 'danger' });
     }
     try {
       await VG.api(`/api/push/${id}`, { decision: act });
-      if (act === 'approve') VG.speak('Approved.', { earcon: 'ok' });
-      else if (act === 'report') VG.speak('Reported. The request was blocked and your bank has been told.', { earcon: 'ok' });
+      const left = pendingPushes().filter((p) => p.id !== id).length;
+      const more = isGuard() && left ? ` ${left} more request${left === 1 ? '' : 's'} waiting.` : '';
+      if (act === 'approve') VG.speak('Approved.' + more, { earcon: 'ok' });
+      else if (act === 'report') VG.speak('Reported. The request was blocked and your bank has been told.' + more, { earcon: 'ok' });
       else {
-        VG.speak(isGuard() ? 'Denied.' : 'Denied. Secure your account. Change password.');
+        VG.speak(isGuard() ? 'Denied.' + more : 'Denied. Secure your account. Change password.');
         if (!isGuard()) changePasswordUntil = Date.now() + 15000;
       }
+      const next = box.querySelector('h2');
+      if (next) next.focus();
     } catch (err) {
       VG.speak(err.message, { level: 'danger' });
     }
   });
 
   VG.on('state', render);
-  // Requests that arrived before audio was switched on are announced again.
+  // Requests that arrived before audio was switched on are announced now.
   document.addEventListener('vg-audio-ready', () => { announced.clear(); setTimeout(render, 1500); });
 
   setInterval(() => {
     document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     if (!S()) return;
+    render(); // picks up locks that end with time and the change-password prompt timing out
     for (const el of box.querySelectorAll('[data-timer]')) {
       const p = S().pushes.find((x) => x.id === el.dataset.timer);
       if (!p) continue;
@@ -209,7 +266,7 @@
         VG.speak(`15 seconds left to answer the ${p.service} request.`, { interrupt: false });
       }
     }
-    if (changePasswordUntil && Date.now() > changePasswordUntil) { changePasswordUntil = 0; render(); }
+    if (changePasswordUntil && Date.now() > changePasswordUntil) changePasswordUntil = 0;
   }, 1000);
 })();
 </script>

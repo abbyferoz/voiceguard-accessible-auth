@@ -143,6 +143,7 @@
 
   function render(announce) {
     const url = current.url;
+    view.dataset.sessionKey = '';
     let a = null;
     if (url === HOME) renderHome(announce);
     else if (url.startsWith(MAIL)) renderMail(announce);
@@ -307,6 +308,11 @@
   function renderSessionStatus(brand) {
     if (session.clone) return;
     const live = S().sessions.find((s) => s.id === session.id) || session;
+    // Redraw only when the sign-in status changes, so a screen reader keeps its place
+    // while other server updates (pushes, logs) arrive.
+    const key = `${live.id}:${live.status}:${VG.guard('codeWord')}`;
+    if (view.dataset.sessionKey === key) return;
+    view.dataset.sessionKey = key;
     const dev = S().victimDevice;
     const codeOn = VG.guard('codeWord');
     if (live.status === 'pending') {
