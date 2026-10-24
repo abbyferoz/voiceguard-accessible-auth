@@ -1,6 +1,6 @@
 # Phishing evaluation results
 
-Generated 2026-10-24T15:36:45.904Z with `node eval/phishing-eval.js`.
+Generated 2026-10-24T15:43:02.060Z with `node eval/phishing-eval.js`.
 
 - Trusted domains: 50. Generated look-alikes: 1114. Legitimate non-trusted domains: 85.
 - Detection rate: **99.6%**. Correct real site named: **99.6%**.
