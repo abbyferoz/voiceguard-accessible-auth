@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceGuard Phone</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-page="phone">
+<div id="audio-gate" class="audio-gate" data-welcome="Phone ready. No sign-in requests.">
+  <div class="card">
+    <h1>Participant phone</h1>
+    <p>Open this page on a real phone (with VoiceOver or TalkBack) or keep it in a second window.</p>
+    <button class="primary big">Start (turns on audio)</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="/">Voice<span>Guard</span> · Phone</a>
+  <div class="controls">
+    <span id="cond" class="pill">…</span>
+    <label for="voice-mode">Voice</label>
+    <select id="voice-mode">
+      <option value="tts">Built-in voice</option>
+      <option value="sr">My screen reader</option>
+      <option value="both">Both</option>
+      <option value="off">Silent (transcript only)</option>
+    </select>
+    <span id="conn-status" class="muted" role="status"></span>
+  </div>
+</header>
+
+<main class="phone-wrap">
+  <section class="phone" aria-label="Phone">
+    <div class="phone-status" aria-hidden="true"><span id="clock">--:--</span><span>5G ▮▮▮</span></div>
+    <div class="phone-screen">
+      <h1 style="font-size:1.1rem">Authenticator</h1>
+      <div id="pushes"></div>
+      <div id="activity"></div>
+    </div>
+  </section>
+  <aside class="card" style="width:340px;max-width:100%" aria-label="What the screen reader said">
+    <h2>Spoken output</h2>
+    <ol id="transcript" class="transcript"></ol>
+  </aside>
+</main>
+
+<div id="live-polite" class="sr-only" aria-live="polite"></div>
+<div id="live-assertive" class="sr-only" aria-live="assertive"></div>
+
+<script src="/js/domain-guard.js"></script>
+<script src="/js/push-guard.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(() => {
+  const box = document.getElementById('pushes');
+  const activity = document.getElementById('activity');
+  const esc = VG.esc;
+  const announced = new Set();
+  const warnedLow = new Set();
+  let changePasswordUntil = 0;
+
+  const S = () => VG.state;
+  const isGuard = () => S() && S().config.condition === 'guard';
+  function components() {
+    const c = {};
+    for (const k of Object.keys(PushGuard.DEFAULT_COMPONENTS)) c[k] = VG.guard(k);
+    return c;
+  }
+  function assess(p) {
+    return PushGuard.assess(p, S().pushes, VG.now(),
+      { rate: S().config.speechRate, knownDevices: [PushGuard.deviceKey(S().victimDevice)] }, components());
+  }
+  const secondsLeft = (p) => Math.max(0, Math.round((p.expiresAt - VG.now()) / 1000));
+
+  function visiblePushes() {
+    const pending = S().pushes.filter((p) => p.status === 'pending').sort((a, b) => a.createdAt - b.createdAt);
+    if (isGuard()) return pending;
+    // Deployed apps: the newest notification replaces the older one.
+    return pending.length ? [pending[pending.length - 1]] : [];
+  }
+
+  function card(p) {
+    const guard = isGuard();
+    const a = guard ? assess(p) : null;
+    const c = components();
+    const warnings = a ? a.warnings.map((w) => `<div class="banner ${w.level}" role="alert"><strong>${w.type === 'fatigue' ? 'Possible push-fatigue attack' : w.type === 'concurrent' ? 'More than one request' : 'New device'}</strong>${esc(w.text)}</div>`).join('') : '';
+    const details = guard && c.context ? `
+      <dl>
+        <dt>From</dt><dd>${esc(PushGuard.deviceLabel(p.device))}</dd>
+        <dt>Near</dt><dd>${esc(p.device ? p.device.location : 'unknown')}</dd>
+        <dt>Started</dt><dd>${new Date(p.createdAt).toLocaleTimeString()}</dd>
+        ${a.pendingCount > 1 ? `<dt>Request</dt><dd>${a.pendingCount} waiting</dd>` : ''}
+      </dl>` : '';
+    const code = guard && c.codeWord ? `<p>Code word: <span class="code-word" style="font-size:1.3rem">${esc(p.codeWord)}</span></p>` : '';
+    const locked = a && a.locked;
+    const approveLabel = guard ? 'Approve' : 'Yes';
+    const denyLabel = guard ? 'Deny' : 'No, it’s not me';
+    return `
+      <article class="push ${a && a.level === 'danger' ? 'danger' : ''}" aria-labelledby="t-${p.id}" data-id="${p.id}">
+        <div class="svc" id="t-${p.id}">${esc(p.service)}</div>
+        <p>${guard && c.context ? 'Sign-in request' : 'Are you trying to sign in?'}</p>
+        ${details}${code}${warnings}
+        <div class="actions">
+          <button class="primary" data-act="approve" data-key="${p.id}-approve" ${locked ? 'aria-disabled="true"' : ''}>${approveLabel}${locked ? ' (locked)' : ''}</button>
+          <button data-act="deny" data-key="${p.id}-deny">${denyLabel}</button>
+          ${guard ? `<button class="report danger" data-act="report" data-key="${p.id}-report">Report: this wasn’t me</button>` : ''}
+          ${guard ? `<button class="report" data-act="repeat" data-key="${p.id}-repeat">Repeat details</button>` : ''}
+        </div>
+        <div class="timer" data-timer="${p.id}">${secondsLeft(p)} seconds left</div>
+      </article>`;
+  }
+
+  function render() {
+    if (!S()) return;
+    const cond = document.getElementById('cond');
+    cond.textContent = isGuard() ? 'VoiceGuard on' : 'Baseline';
+    cond.className = 'pill ' + S().config.condition;
+
+    const focusedKey = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key : null;
+    const list = visiblePushes();
+    let html = list.map(card).join('');
+    if (!isGuard() && !list.length && Date.now() < changePasswordUntil) {
+      // Google Push on VoiceOver: after a denial the user is sent to a password change,
+      // in the same place where the next (attacker) prompt will appear.
+      html = `<article class="push"><div class="svc">Secure your account</div>
+        <p>If this wasn’t you, change your password now.</p>
+        <div class="actions"><button class="primary" data-act="change-password" data-key="cp">Change password</button>
+        <button data-act="dismiss" data-key="cp-dismiss">Not now</button></div></article>`;
+    }
+    box.innerHTML = html || '<p class="empty">No sign-in requests</p>';
+
+    if (isGuard()) {
+      const recent = S().pushes.filter((p) => p.status !== 'pending').slice(-5).reverse();
+      activity.innerHTML = recent.length ? `<h2 style="font-size:.95rem">Recent activity</h2><ul class="muted" style="padding-left:18px;font-size:.85rem">${
+        recent.map((p) => `<li>${esc(p.service)} · ${esc(PushGuard.deviceLabel(p.device))} · ${esc(p.status)}</li>`).join('')}</ul>` : '';
+    } else activity.innerHTML = '';
+
+    if (focusedKey) {
+      const el = box.querySelector(`[data-key="${focusedKey}"]`);
+      if (el) el.focus();
+    }
+    announceNew(list);
+  }
+
+  function announceNew(list) {
+    const pending = S().pushes.filter((p) => p.status === 'pending');
+    const fresh = pending.filter((p) => !announced.has(p.id));
+    if (!fresh.length) return;
+    fresh.forEach((p) => announced.add(p.id));
+    if (isGuard()) {
+      const p = fresh[fresh.length - 1];
+      const a = assess(p);
+      VG.speak(a.announcement, { earcon: a.level === 'danger' ? 'danger' : 'notify', level: a.level === 'danger' ? 'danger' : '' });
+      if (a.warnings.length) VG.log('guard_warning', { where: 'push', pushId: p.id, warnings: a.warnings.map((w) => w.type), locked: a.locked });
+    } else {
+      const p = list[list.length - 1];
+      if (p) VG.speak(PushGuard.baselineAnnouncement(p), { earcon: 'notify' });
+    }
+    const first = box.querySelector('[data-act="approve"], [data-act="change-password"]');
+    if (first && !box.contains(document.activeElement)) first.focus();
+  }
+
+  box.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    const act = btn.dataset.act;
+    if (act === 'change-password') {
+      VG.log('change_password_prompt', { choice: 'change' });
+      changePasswordUntil = 0;
+      VG.speak('Password change started. Approve the next request to continue.');
+      return render();
+    }
+    if (act === 'dismiss') { changePasswordUntil = 0; return render(); }
+    const id = btn.closest('[data-id]').dataset.id;
+    const push = S().pushes.find((p) => p.id === id);
+    if (act === 'repeat') return VG.speak(assess(push).announcement);
+    if (btn.getAttribute('aria-disabled') === 'true') {
+      VG.log('locked_approve_attempt', { pushId: id });
+      return VG.speak('Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report.', { level: 'danger' });
+    }
+    try {
+      await VG.api(`/api/push/${id}`, { decision: act });
+      if (act === 'approve') VG.speak('Approved.', { earcon: 'ok' });
+      else if (act === 'report') VG.speak('Reported. The request was blocked and your bank has been told.', { earcon: 'ok' });
+      else {
+        VG.speak(isGuard() ? 'Denied.' : 'Denied. Secure your account. Change password.');
+        if (!isGuard()) changePasswordUntil = Date.now() + 15000;
+      }
+    } catch (err) {
+      VG.speak(err.message, { level: 'danger' });
+    }
+  });
+
+  VG.on('state', render);
+
+  setInterval(() => {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!S()) return;
+    for (const el of box.querySelectorAll('[data-timer]')) {
+      const p = S().pushes.find((x) => x.id === el.dataset.timer);
+      if (!p) continue;
+      const left = secondsLeft(p);
+      el.textContent = `${left} seconds left`;
+      if (isGuard() && VG.guard('adaptiveExpiry') && left === 15 && !warnedLow.has(p.id)) {
+        warnedLow.add(p.id);
+        VG.speak(`15 seconds left to answer the ${p.service} request.`, { interrupt: false });
+      }
+    }
+    if (changePasswordUntil && Date.now() > changePasswordUntil) { changePasswordUntil = 0; render(); }
+  }, 1000);
+})();
+</script>
+</body>
+</html>

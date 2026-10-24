@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceGuard Study Runner</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-page="study">
+<header class="topbar">
+  <a class="brand" href="/">Voice<span>Guard</span> · Experimenter</a>
+  <div class="controls">
+    <span id="cond" class="pill">…</span>
+    <a class="btn" href="/results.html">Results</a>
+    <span id="conn-status" class="muted" role="status"></span>
+  </div>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>1 · Participant and block</h2>
+      <div class="row">
+        <div class="field"><label for="pid">Participant ID</label><input id="pid" value="P01" size="8"></div>
+        <div class="field"><label for="block">Block</label><select id="block"><option value="1">Block 1</option><option value="2">Block 2</option></select></div>
+      </div>
+      <p id="plan" class="muted"></p>
+      <button class="primary" id="apply">Apply block settings</button>
+      <details style="margin-top:12px">
+        <summary>Advanced: condition, speech rate, ablation</summary>
+        <div class="field" style="margin-top:8px"><label for="condition">Condition (override)</label>
+          <select id="condition"><option value="baseline">Baseline</option><option value="guard">VoiceGuard</option></select></div>
+        <div class="field"><label for="rate">Speech rate</label>
+          <select id="rate"><option value="1">1.0 (default)</option><option value="1.25">1.25</option><option value="1.5">1.5</option><option value="1.75">1.75</option><option value="2">2.0</option></select></div>
+        <fieldset id="components" style="border:1px solid var(--line);border-radius:8px"><legend>VoiceGuard components</legend></fieldset>
+        <button id="apply-adv" style="margin-top:8px">Apply</button>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>2 · Current task</h2>
+      <div id="current"><p class="muted">No task running.</p></div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>3 · Tasks for this block</h2>
+    <p class="muted">Order is randomised per participant and block. Read each instruction to the participant, then press Start.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Task</th><th>Instruction</th><th>Outcome</th><th></th></tr></thead>
+      <tbody id="task-rows"></tbody>
+    </table></div>
+    <div class="row" style="margin-top:10px">
+      <button id="reset">Reset devices</button>
+      <a class="btn" href="/api/export/results.csv">Download results.csv</a>
+      <a class="btn" href="/api/export/events.csv">Download events.csv</a>
+      <a class="btn" href="/api/export/questionnaires.csv">Download questionnaires.csv</a>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <h2>4 · After the block: questionnaires</h2>
+    <form id="q">
+      <h3>System Usability Scale (1 = strongly disagree, 5 = strongly agree)</h3>
+      <div id="sus"></div>
+      <h3 style="margin-top:14px">NASA-TLX (0 = very low, 100 = very high)</h3>
+      <div id="tlx" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px"></div>
+      <div class="field" style="margin-top:10px"><label for="trust">“I could tell which requests and links were safe” (1–7)</label>
+        <input id="trust" type="number" min="1" max="7" value="4"></div>
+      <div class="field"><label for="comments">Comments / interview notes</label><textarea id="comments" rows="3"></textarea></div>
+      <button class="primary" type="submit">Save questionnaire for this block</button>
+      <span id="q-status" class="muted" role="status"></span>
+    </form>
+  </section>
+</main>
+<script src="/js/domain-guard.js"></script>
+<script src="/js/push-guard.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = VG.esc;
+  const SUS = [
+    'I think that I would like to use this system frequently.',
+    'I found the system unnecessarily complex.',
+    'I thought the system was easy to use.',
+    'I think that I would need the support of a technical person to be able to use this system.',
+    'I found the various functions in this system were well integrated.',
+    'I thought there was too much inconsistency in this system.',
+    'I would imagine that most people would learn to use this system very quickly.',
+    'I found the system very cumbersome to use.',
+    'I felt very confident using the system.',
+    'I needed to learn a lot of things before I could get going with this system.',
+  ];
+  const TLX = ['Mental demand', 'Physical demand', 'Temporal demand', 'Performance (0 = perfect)', 'Effort', 'Frustration'];
+  const LIMIT_S = { legit_email: 150, phish_typo: 120, legit_login: 120, concurrent: 120, fatigue: 80, phish_subdomain: 120 };
+  let results = [];
+  let timer = null;
+
+  $('sus').innerHTML = SUS.map((q, i) => `<div class="likert" role="radiogroup" aria-label="${esc(q)}"><span>${i + 1}. ${esc(q)}</span>${
+    [1, 2, 3, 4, 5].map((v) => `<input type="radio" name="sus${i}" value="${v}" aria-label="${v}" ${v === 3 ? 'checked' : ''}>`).join('')}</div>`).join('');
+  $('tlx').innerHTML = TLX.map((t, i) => `<div class="field"><label for="tlx${i}">${t}: <output id="tlxo${i}">50</output></label>
+    <input id="tlx${i}" type="range" min="0" max="100" step="5" value="50" oninput="tlxo${i}.value=this.value"></div>`).join('');
+
+  // Odd participant numbers start with baseline, even with VoiceGuard (AB/BA counterbalancing).
+  function order(pid) {
+    const n = parseInt(String(pid).replace(/\D/g, ''), 10) || 0;
+    return n % 2 === 1 ? ['baseline', 'guard'] : ['guard', 'baseline'];
+  }
+  function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function shuffled(tasks, seed) {
+    const a = tasks.slice();
+    let x = seed || 1;
+    for (let i = a.length - 1; i > 0; i--) { x = (Math.imul(x, 1103515245) + 12345) >>> 0; const j = x % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function planText() {
+    const o = order($('pid').value);
+    const b = Number($('block').value);
+    return `${$('pid').value}: block 1 = ${o[0]} (brand set A), block 2 = ${o[1]} (brand set B). Block ${b} → ${o[b - 1]}.`;
+  }
+  ['pid', 'block'].forEach((id) => $(id).addEventListener('input', () => { $('plan').textContent = planText(); renderTasks(); }));
+
+  $('apply').addEventListener('click', async () => {
+    const b = Number($('block').value);
+    await VG.api('/api/config', { participant: $('pid').value, block: b, condition: order($('pid').value)[b - 1], brandSet: b === 1 ? 'A' : 'B' });
+    await VG.api('/api/reset', {});
+    loadResults();
+  });
+  $('apply-adv').addEventListener('click', () => {
+    const components = {};
+    $('components').querySelectorAll('input').forEach((i) => { components[i.name] = i.checked; });
+    VG.api('/api/config', { condition: $('condition').value, speechRate: Number($('rate').value), components });
+  });
+  $('reset').addEventListener('click', () => VG.api('/api/reset', {}));
+
+  function renderTasks() {
+    const s = VG.state;
+    if (!s) return;
+    const pid = s.config.participant, block = s.config.block;
+    const list = shuffled(s.tasks, hash(`${pid}-${block}`));
+    $('task-rows').innerHTML = list.map((t, i) => {
+      const r = results.filter((x) => x.participant === pid && x.block === block && x.task === t.id).pop();
+      const running = s.task && s.task.id === t.id;
+      return `<tr><td>${i + 1}</td><td><strong>${t.id}</strong><br><span class="muted">${t.kind}${t.attack ? ' · ' + t.attack : ''}</span></td>
+        <td>${esc(t.instruction)}</td>
+        <td>${r ? `<strong>${r.outcome}</strong><br><span class="muted">${esc(r.detail)}</span>` : '—'}</td>
+        <td>${running ? '<span class="pill guard">running</span>' : `<button data-start="${t.id}">${r ? 'Redo' : 'Start'}</button>`}</td></tr>`;
+    }).join('');
+    $('task-rows').querySelectorAll('[data-start]').forEach((b) => b.addEventListener('click', () => VG.api('/api/task/start', { taskId: b.dataset.start })));
+  }
+
+  function renderCurrent() {
+    const s = VG.state;
+    clearInterval(timer);
+    if (!s.task) { $('current').innerHTML = '<p class="muted">No task running.</p>'; return; }
+    const t = s.task;
+    $('current').innerHTML = `
+      <p><strong>${t.id}</strong> · ${s.config.participant} · ${s.config.condition} · set ${t.set}</p>
+      <p class="banner ok">${esc(t.instruction)}</p>
+      <p>Elapsed: <strong id="elapsed">0</strong> s <span class="muted">(suggested limit ${LIMIT_S[t.id]} s)</span></p>
+      <div class="field"><label for="notes">Observer notes</label><textarea id="notes" rows="2"></textarea></div>
+      <div class="row"><button id="read">Read instruction aloud</button><button class="primary" id="end">End task and score</button></div>`;
+    $('read').addEventListener('click', () => VG.speak(t.instruction));
+    $('end').addEventListener('click', async () => { await VG.api('/api/task/end', { notes: $('notes').value }); loadResults(); });
+    timer = setInterval(() => {
+      const el = $('elapsed');
+      if (!el) return;
+      const sec = Math.round((VG.now() - t.startedAt) / 1000);
+      el.textContent = sec;
+      el.style.color = sec > LIMIT_S[t.id] ? 'var(--danger)' : '';
+    }, 1000);
+  }
+
+  let lastTaskRun = undefined;
+  let filled = false;
+  VG.on('state', (s) => {
+    $('cond').textContent = `${s.config.participant} · block ${s.config.block} · ${s.config.condition === 'guard' ? 'VoiceGuard' : 'Baseline'}`;
+    $('cond').className = 'pill ' + s.config.condition;
+    if (!filled) {
+      filled = true;
+      $('pid').value = s.config.participant === 'P00' ? 'P01' : s.config.participant;
+      $('block').value = String(s.config.block);
+      $('condition').value = s.config.condition;
+      $('rate').value = String(s.config.speechRate);
+      $('components').innerHTML = Object.entries(s.config.components).map(([k, v]) =>
+        `<label class="row" style="font-weight:500"><input type="checkbox" name="${k}" ${v ? 'checked' : ''}> ${k}</label>`).join('');
+      $('plan').textContent = planText();
+    }
+    const run = s.task ? s.task.run : null;
+    if (run !== lastTaskRun) { lastTaskRun = run; renderCurrent(); if (!run) loadResults(); }
+    renderTasks();
+  });
+
+  async function loadResults() {
+    results = (await VG.api('/api/results')).rows;
+    renderTasks();
+  }
+  loadResults();
+
+  $('q').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const sus = SUS.map((_, i) => Number(document.querySelector(`input[name=sus${i}]:checked`).value));
+    const tlx = TLX.map((_, i) => Number($('tlx' + i).value));
+    const out = await VG.api('/api/questionnaire', { sus, tlx, trust: Number($('trust').value), comments: $('comments').value });
+    $('q-status').textContent = `Saved. SUS = ${out.saved.susScore}, raw TLX = ${out.saved.tlxRaw.toFixed(1)}.`;
+  });
+})();
+</script>
+</body>
+</html>

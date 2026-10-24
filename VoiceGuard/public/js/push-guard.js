@@ -24,7 +24,7 @@
     cooldownMs: 300000,      // approvals stay locked this long after the last suspicious push
     concurrentWindowMs: 45000, // two pending pushes this close together = concurrent login
     baseExpiryMs: 60000,     // what deployed services typically allow
-    actionBufferMs: 20000,   // time to find and press a button after listening
+    actionBufferMs: 30000,   // time to find and press a button after listening
     wordsPerMinute: 180,     // speech-synthesis speed at rate 1.0 (screen reader default ~50%)
     knownDevices: [],        // devices the user has signed in from before
   };
@@ -120,7 +120,7 @@
     const announcement = parts.join(' ');
 
     const expiresMs = c.adaptiveExpiry
-      ? Math.max(o.baseExpiryMs, Math.round(speechSeconds(announcement, o.rate, o.wordsPerMinute) * 1500 + o.actionBufferMs))
+      ? Math.max(o.baseExpiryMs, Math.round(speechSeconds(announcement, o.rate, o.wordsPerMinute) * 2000 + o.actionBufferMs))
       : o.baseExpiryMs;
 
     return {

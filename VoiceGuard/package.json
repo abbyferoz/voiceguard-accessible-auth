@@ -1,0 +1,14 @@
+{
+  "name": "voiceguard",
+  "version": "1.0.0",
+  "description": "Screen-reader-aware protection against phishing, concurrent-login and push-fatigue attacks",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-tests.js",
+    "eval": "node eval/phishing-eval.js && node eval/push-eval.js"
+  },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}

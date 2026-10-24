@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceGuard Computer</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-page="pc">
+<div id="audio-gate" class="audio-gate" data-welcome="Computer ready. You are on the start page.">
+  <div class="card">
+    <h1>Participant computer</h1>
+    <p>This window plays the part of your computer and its screen reader.</p>
+    <button class="primary big">Start (turns on audio)</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="/">Voice<span>Guard</span> · Computer</a>
+  <div class="controls">
+    <span id="cond" class="pill">…</span>
+    <label for="voice-mode">Voice</label>
+    <select id="voice-mode">
+      <option value="tts">Built-in voice</option>
+      <option value="sr">My screen reader</option>
+      <option value="both">Both</option>
+      <option value="off">Silent (transcript only)</option>
+    </select>
+    <span id="conn-status" class="muted" role="status"></span>
+  </div>
+</header>
+
+<main>
+  <div class="grid" style="grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);">
+    <section class="browser" aria-label="Web browser">
+      <div class="browser-bar">
+        <button id="btn-back" aria-label="Back">←</button>
+        <button id="btn-home" aria-label="Start page">⌂</button>
+        <div id="address" class="address" role="textbox" aria-readonly="true" aria-label="Address"></div>
+      </div>
+      <div id="viewport" class="viewport" tabindex="-1"></div>
+    </section>
+    <aside class="card" aria-label="What the screen reader said">
+      <h2>Spoken output</h2>
+      <ol id="transcript" class="transcript"></ol>
+    </aside>
+  </div>
+</main>
+
+<dialog id="interstitial" aria-labelledby="int-title" aria-describedby="int-desc">
+  <div class="inner">
+    <h2 id="int-title">Look-alike website blocked</h2>
+    <p id="int-desc"></p>
+    <div class="row">
+      <button id="int-back" class="primary">Go back to safety</button>
+      <button id="int-continue">Continue anyway</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="live-polite" class="sr-only" aria-live="polite"></div>
+<div id="live-assertive" class="sr-only" aria-live="assertive"></div>
+
+<script src="/js/domain-guard.js"></script>
+<script src="/js/push-guard.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(() => {
+  const view = document.getElementById('viewport');
+  const address = document.getElementById('address');
+  const dialog = document.getElementById('interstitial');
+  const esc = VG.esc;
+  const HOME = 'about:start';
+  const MAIL = 'https://mail.campusmail.edu/inbox';
+  let history = [];
+  let current = { url: HOME };
+  let session = null;          // the sign-in this computer started
+  let announcedSession = null; // last session status we spoke
+  const spokenLinks = new Set();
+
+  const S = () => VG.state;
+  const allBrands = () => Object.values(S().brandSets).flatMap((s) => [s.bank, s.pay]);
+  const brandFor = (domain) => allBrands().find((b) => b.domain === domain);
+  const analyze = (url) => DomainGuard.analyze(url, S().trusted);
+  const hostOf = (url) => (DomainGuard.parse(url) || {}).host || url;
+
+  function brandColor(domain) {
+    let h = 0;
+    for (const c of domain) h = (h * 31 + c.charCodeAt(0)) % 360;
+    return `hsl(${h} 60% 38%)`;
+  }
+
+  // ---------------- navigation ----------------
+  function go(url, opts) {
+    const o = opts || {};
+    if (url.startsWith('https://') && url !== MAIL) {
+      const a = analyze(url);
+      if (a.verdict === 'lookalike' && VG.guard('interstitial') && !o.confirmed) return showInterstitial(url, a);
+    }
+    if (!o.noHistory && current.url !== url) history.push(current.url);
+    current = { url, mailId: o.mailId || null };
+    session = o.keepSession ? session : null;
+    render(true);
+  }
+
+  function showInterstitial(url, a) {
+    const text = DomainGuard.announcePage(a);
+    document.getElementById('int-desc').textContent = text;
+    dialog.dataset.url = url;
+    dialog.showModal();
+    document.getElementById('int-back').focus();
+    VG.speak(`${text} Press Enter to go back to safety.`, { earcon: 'danger', level: 'danger' });
+    VG.log('guard_warning', { where: 'interstitial', url, attack: a.attack, target: a.target });
+    VG.log('interstitial_shown', { url, attack: a.attack });
+  }
+  document.getElementById('int-back').addEventListener('click', () => {
+    dialog.close();
+    VG.log('interstitial_back', { url: dialog.dataset.url });
+    VG.speak('You stayed safe. Back on the previous page.', { earcon: 'ok' });
+    render(false);
+  });
+  document.getElementById('int-continue').addEventListener('click', () => {
+    dialog.close();
+    VG.log('interstitial_continue', { url: dialog.dataset.url });
+    go(dialog.dataset.url, { confirmed: true });
+  });
+
+  document.getElementById('btn-back').addEventListener('click', () => {
+    if (!history.length) return VG.speak('No previous page.');
+    current = { url: history.pop() };
+    session = null;
+    render(true);
+  });
+  document.getElementById('btn-home').addEventListener('click', () => go(HOME));
+
+  // ---------------- rendering ----------------
+  function setAddress(url, a) {
+    const danger = a && a.verdict === 'lookalike' && VG.guard('domain');
+    address.className = 'address' + (danger ? ' danger' : '');
+    address.innerHTML = url === HOME ? 'Start page'
+      : `<span class="lock" aria-hidden="true">${danger ? '⚠️' : '🔒'}</span>${esc(url)}`;
+  }
+
+  function render(announce) {
+    const url = current.url;
+    let a = null;
+    if (url === HOME) renderHome(announce);
+    else if (url.startsWith(MAIL)) renderMail(announce);
+    else {
+      a = analyze(url);
+      renderSite(url, a, announce);
+    }
+    setAddress(url, a);
+  }
+
+  function renderHome(announce) {
+    const b = S().brands;
+    view.innerHTML = `
+      <h1>Start page</h1>
+      <p class="muted">Bookmarks</p>
+      <div class="bookmarks">
+        <button data-go="${MAIL}">📧 Campus Mail<br><span class="muted">mail.campusmail.edu</span></button>
+        <button data-go="https://${b.bank.domain}/login">🏦 ${esc(b.bank.name)}<br><span class="muted">${esc(b.bank.domain)}</span></button>
+        <button data-go="https://${b.pay.domain}/login">💳 ${esc(b.pay.name)}<br><span class="muted">${esc(b.pay.domain)}</span></button>
+      </div>`;
+    view.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', () => go(el.dataset.go)));
+    if (announce) {
+      VG.speak('Start page. Bookmarks: Campus Mail, ' + b.bank.name + ', ' + b.pay.name + '.');
+      view.querySelector('button').focus();
+    }
+  }
+
+  function renderMail(announce) {
+    const inbox = S().inbox;
+    const mail = current.mailId && inbox.find((m) => m.id === current.mailId);
+    if (mail) return renderMessage(mail, announce);
+    const unread = inbox.filter((m) => !m.read).length;
+    view.innerHTML = `
+      <div class="site-header" style="--brand:#1f5fb8"><div class="site-logo" aria-hidden="true">M</div><h1>Inbox</h1></div>
+      <p class="muted">${inbox.length} messages, ${unread} unread</p>
+      <ul class="mail-list">${inbox.map((m) => `
+        <li><button data-id="${m.id}" class="${m.read ? '' : 'unread'}">
+          <span class="from">${esc(m.from)}</span>${m.read ? '' : '<span class="sr-only">Unread. </span>'}${esc(m.subject)}
+        </button></li>`).join('')}</ul>`;
+    view.querySelectorAll('[data-id]').forEach((el) => el.addEventListener('click', () => {
+      current.mailId = el.dataset.id;
+      render(true);
+    }));
+    if (announce) {
+      const pageNote = VG.guard('pageAnnounce') ? 'Verified site: mail dot campusmail dot edu. ' : '';
+      VG.speak(`${pageNote}Inbox. ${inbox.length} messages, ${unread} unread.`);
+    }
+    const first = view.querySelector('.mail-list button');
+    if (first && announce) first.focus();
+  }
+
+  function renderMessage(m, announce) {
+    if (!m.read) VG.api('/api/mail/read', { id: m.id });
+    view.innerHTML = `
+      <button id="to-inbox">← Inbox</button>
+      <article class="mail-body" style="margin-top:12px">
+        <h1>${esc(m.subject)}</h1>
+        <p class="muted">From: ${esc(m.from)}</p>
+        <p>${esc(m.body)}</p>
+        ${m.link ? `<p><a class="link" href="#" data-url="${esc(m.link)}">${esc(m.linkText || m.link)}</a></p>` : ''}
+        <div class="row" style="margin-top:16px">
+          <button id="report">Report as phishing</button>
+          <button id="delete">Delete</button>
+        </div>
+      </article>`;
+    if (announce) {
+      VG.log('mail_opened', { id: m.id, kind: m.kind, attack: m.attack || null });
+      VG.speak(`Message from ${m.from.split('@')[0]}. Subject: ${m.subject}. ${m.body}`);
+    }
+    document.getElementById('to-inbox').addEventListener('click', () => { current.mailId = null; render(true); });
+    document.getElementById('report').addEventListener('click', () => {
+      VG.log('mail_reported', { id: m.id, kind: m.kind });
+      VG.api('/api/mail/delete', { id: m.id });
+      VG.speak('Reported as phishing and removed. Thank you.', { earcon: 'ok' });
+      current.mailId = null;
+    });
+    document.getElementById('delete').addEventListener('click', () => {
+      VG.log('mail_deleted', { id: m.id, kind: m.kind });
+      VG.api('/api/mail/delete', { id: m.id });
+      VG.speak('Message deleted.');
+      current.mailId = null;
+    });
+    const link = view.querySelector('a[data-url]');
+    if (link) {
+      link.addEventListener('focus', () => announceLink(link));
+      link.addEventListener('mouseenter', () => announceLink(link));
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const a = analyze(link.dataset.url);
+        if (a.verdict === 'lookalike') VG.log('phish_link_activated', { url: link.dataset.url, attack: a.attack });
+        else VG.log('link_activated', { url: link.dataset.url });
+        go(link.dataset.url);
+      });
+    }
+    if (announce) document.getElementById('to-inbox').focus();
+  }
+
+  function announceLink(link) {
+    const url = link.dataset.url;
+    const a = analyze(url);
+    if (VG.guard('domain')) {
+      VG.speak(DomainGuard.announceLink(a, link.textContent), a.verdict === 'lookalike' ? { earcon: 'danger', level: 'danger' } : {});
+      if (a.verdict === 'lookalike' && !spokenLinks.has(url)) {
+        spokenLinks.add(url);
+        VG.log('guard_warning', { where: 'link', url, attack: a.attack, target: a.target });
+      }
+    } else {
+      // How screen readers read a link today: link text, then the address as whole words.
+      VG.speak(`Link. ${link.textContent}. ${DomainGuard.readAsScreenReader(hostOf(url))}`);
+    }
+  }
+
+  function renderSite(url, a, announce) {
+    const isClone = a.verdict === 'lookalike';
+    const brand = brandFor(isClone ? a.target : a.registrable);
+    if (!brand) {
+      const known = a.verdict === 'trusted';
+      view.innerHTML = known
+        ? `<h1>${esc(hostOf(url))}</h1><p>Done. Your request was completed.</p>`
+        : `<h1>This site can’t be reached</h1><p class="muted">${esc(hostOf(url))}</p>`;
+      if (announce) VG.speak(known ? `${hostOf(url)}. Your request was completed.` : 'This site can’t be reached.');
+      return;
+    }
+    if (announce) {
+      if (isClone) VG.log('phish_page_opened', { url, attack: a.attack, target: a.target });
+      if (VG.guard('pageAnnounce')) {
+        VG.speak(`${DomainGuard.announcePage(a)} ${brand.name}, sign in.`, isClone ? { earcon: 'danger', level: 'danger' } : {});
+        if (isClone) VG.log('guard_warning', { where: 'page', url, attack: a.attack, target: a.target });
+      } else {
+        VG.speak(`${brand.name}. Sign in. Heading level 1.`); // a clone has the same title, so it sounds the same
+      }
+    }
+    if (session) return renderSessionStatus(brand);
+    view.innerHTML = `
+      <div class="site-header" style="--brand:${brandColor(brand.domain)}">
+        <div class="site-logo" aria-hidden="true">${esc(brand.name[0])}</div><h1>${esc(brand.name)}</h1>
+      </div>
+      <form class="login-box" id="login">
+        <h2>Sign in</h2>
+        <div class="field"><label for="user">Email</label><input id="user" autocomplete="off" value="${esc(S().account)}"></div>
+        <div class="field"><label for="pass">Password</label><input id="pass" type="password" autocomplete="off" placeholder="Use the study password"></div>
+        <button class="primary" type="submit">Sign in</button>
+        <p class="muted" style="margin-top:10px">Simulation only. Use the study password on your card, never a real one.</p>
+      </form>`;
+    document.getElementById('login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isClone) {
+        VG.log('phish_credentials_submitted', { url, attack: a.attack, target: a.target });
+        session = { clone: true, brand };
+        view.innerHTML = `<h1>Check your phone</h1><p>Approve the request on your phone to finish signing in.</p>`;
+        VG.speak('Check your phone. Approve the request on your phone to finish signing in.');
+        return;
+      }
+      const { session: s } = await VG.api('/api/login', { actor: 'victim', service: brand.name, domain: brand.domain });
+      session = s;
+      announcedSession = null;
+      renderSessionStatus(brand);
+    });
+    if (announce) document.getElementById('pass').focus();
+  }
+
+  function renderSessionStatus(brand) {
+    if (session.clone) return;
+    const live = S().sessions.find((s) => s.id === session.id) || session;
+    const dev = S().victimDevice;
+    const codeOn = VG.guard('codeWord');
+    if (live.status === 'pending') {
+      view.innerHTML = `
+        <div class="site-header" style="--brand:${brandColor(brand.domain)}"><div class="site-logo" aria-hidden="true">${esc(brand.name[0])}</div><h1>${esc(brand.name)}</h1></div>
+        <h2>Check your phone</h2>
+        ${codeOn ? `<p>Your code word is</p><p class="code-word">${esc(live.codeWord)}</p>
+          <p>Only approve a request that says <strong>${esc(live.codeWord)}</strong>. This request comes from ${esc(dev.browser)} on ${esc(dev.os)}, near ${esc(dev.location)}.</p>`
+        : `<p>We sent a notification to your phone. Tap Yes to sign in.</p>`}`;
+      if (announcedSession !== 'pending') {
+        announcedSession = 'pending';
+        VG.speak(codeOn
+          ? `Check your phone. Your code word is ${live.codeWord}. Again: ${live.codeWord}. Only approve a request that says ${live.codeWord}. This request comes from ${dev.browser} on ${dev.os}, near ${dev.location}.`
+          : 'Check your phone. We sent a notification to your phone. Tap Yes to sign in.');
+      }
+    } else if (live.status === 'approved') {
+      view.innerHTML = `<h1>Welcome back</h1><p>You are signed in to ${esc(brand.name)}.</p>
+        <div class="card"><h2>Accounts</h2><p>Current account · Rs 52,340</p><p>October statement · ready</p></div>`;
+      if (announcedSession !== 'approved') { announcedSession = 'approved'; VG.speak(`Signed in. Welcome back to ${brand.name}.`, { earcon: 'ok' }); }
+    } else {
+      view.innerHTML = `<h1>Sign-in not approved</h1><p>The request on your phone was ${esc(live.status)}.</p><button id="retry" class="primary">Try again</button>`;
+      document.getElementById('retry').addEventListener('click', () => { session = null; render(false); });
+      if (announcedSession !== live.status) { announcedSession = live.status; VG.speak(`Sign-in not approved. The request was ${live.status}.`); }
+    }
+  }
+
+  // ---------------- live updates ----------------
+  let lastCondition = null;
+  let inboxSig = '';
+  VG.on('state', (s) => {
+    const c = document.getElementById('cond');
+    c.textContent = s.config.condition === 'guard' ? 'VoiceGuard on' : 'Baseline';
+    c.className = 'pill ' + s.config.condition;
+    if (lastCondition && lastCondition !== s.config.condition) spokenLinks.clear();
+    lastCondition = s.config.condition;
+    if (dialog.open) return;
+    if (session && !session.clone) {
+      const a = analyze(current.url);
+      const brand = brandFor(a.registrable);
+      if (brand) renderSessionStatus(brand);
+    } else if (current.url.startsWith(MAIL)) {
+      const sig = s.inbox.map((m) => m.id + (m.read ? 'r' : 'u')).join();
+      const inMessage = current.mailId && s.inbox.some((m) => m.id === current.mailId);
+      if (sig !== inboxSig && !inMessage) render(false);
+      if (current.mailId && !inMessage) { current.mailId = null; render(true); }
+      inboxSig = sig;
+    } else if (!view.innerHTML) {
+      render(false);
+    }
+  });
+  VG.on('command', (command) => {
+    if (command === 'reset-pc') { history = []; session = null; spokenLinks.clear(); if (dialog.open) dialog.close(); current = { url: HOME }; render(false); }
+  });
+})();
+</script>
+</body>
+</html>

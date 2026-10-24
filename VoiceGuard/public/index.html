@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceGuard</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-page="index">
+<header class="topbar">
+  <span class="brand">Voice<span>Guard</span></span>
+  <div class="controls"><span id="cond" class="pill">…</span><span id="conn-status" class="muted" role="status"></span></div>
+</header>
+<main>
+  <h1>Screen-reader-aware protection for sign-in</h1>
+  <p class="muted" style="max-width:760px">VoiceGuard builds the fixes that <em>Broken Access</em> (WWW ’25) recommended and tests them.
+    It tells screen-reader users exactly how a look-alike link differs from the real site, never lets one push hide another,
+    speaks a code word that ties each push to its sign-in, and spots push-spam.</p>
+
+  <div class="grid" style="margin-top:16px">
+    <a class="card" href="/pc.html" style="text-decoration:none;color:inherit"><h2>💻 Participant computer</h2><p>Mail, bank sign-in and the browser’s spoken output.</p></a>
+    <a class="card" href="/phone.html" style="text-decoration:none;color:inherit"><h2>📱 Participant phone</h2><p>Push approvals. Open it on a real phone to use VoiceOver or TalkBack.</p></a>
+    <a class="card" href="/attacker.html" style="text-decoration:none;color:inherit"><h2>🕶️ Attacker console</h2><p>Send look-alike emails, race a concurrent login, spam pushes.</p></a>
+    <a class="card" href="/study.html" style="text-decoration:none;color:inherit"><h2>🧪 Experimenter</h2><p>Participants, counterbalanced blocks, scripted tasks, questionnaires.</p></a>
+    <a class="card" href="/results.html" style="text-decoration:none;color:inherit"><h2>📊 Results</h2><p>Automated evaluation and study outcomes, baseline against VoiceGuard.</p></a>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>Quick demo (5 minutes)</h2>
+    <ol>
+      <li>Open <strong>Computer</strong> and <strong>Phone</strong> side by side and press Start on each.</li>
+      <li>In <strong>Experimenter</strong>, open “Advanced” and set the condition to <em>Baseline</em>.</li>
+      <li>Phishing: in <strong>Attacker</strong>, send a <em>repetition</em> email, then tab to the link on the computer. Both domains sound the same.</li>
+      <li>Concurrent login: arm the attack, then sign in to the bank from the computer. Only the attacker’s push is left on the phone.</li>
+      <li>Fatigue: start spamming and keep pressing Deny.</li>
+      <li>Switch the condition to <em>VoiceGuard</em> and repeat: you get the phonetic difference, a blocking page, both pushes with code words, and a locked Approve.</li>
+    </ol>
+  </section>
+</main>
+<script src="/js/common.js"></script>
+<script>
+VG.on('state', (s) => {
+  const c = document.getElementById('cond');
+  c.textContent = s.config.condition === 'guard' ? 'VoiceGuard on' : 'Baseline';
+  c.className = 'pill ' + s.config.condition;
+});
+</script>
+</body>
+</html>

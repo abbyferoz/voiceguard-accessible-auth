@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceGuard Attacker Console</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-page="attacker">
+<header class="topbar">
+  <a class="brand" href="/">Voice<span>Guard</span> · Attacker console</a>
+  <div class="controls"><span id="cond" class="pill">…</span><span id="conn-status" class="muted" role="status"></span></div>
+</header>
+<main>
+  <p class="muted">Simulated attacks against the study account only. Nothing leaves this machine.</p>
+  <div class="grid">
+    <section class="card">
+      <h2>1 · Phishing email</h2>
+      <div class="field"><label for="ph-target">Impersonate</label><select id="ph-target"></select></div>
+      <div class="field"><label for="ph-attack">Look-alike technique</label><select id="ph-attack"></select></div>
+      <div class="field"><label for="ph-seed">Variant</label><input id="ph-seed" type="number" value="3" min="1" max="999"></div>
+      <div class="banner warn" id="ph-preview" aria-live="polite"></div>
+      <button class="primary" id="ph-send">Send to victim inbox</button>
+    </section>
+
+    <section class="card">
+      <h2>2 · Concurrent login</h2>
+      <p class="muted">Waits for the victim to sign in, then starts the attacker’s own sign-in so both pushes reach the phone.</p>
+      <div class="field"><label for="cc-delay">Delay after victim (ms)</label><input id="cc-delay" type="number" value="2500" min="0" step="500"></div>
+      <label class="row"><input id="cc-spoof" type="checkbox" checked> Spoof the victim’s browser, OS and city</label>
+      <div class="row" style="margin-top:10px">
+        <button class="primary" id="cc-arm">Arm</button>
+        <button id="cc-now">Send attacker push now</button>
+      </div>
+      <p id="cc-status" class="muted" role="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>3 · Push fatigue (MFA spam)</h2>
+      <div class="field"><label for="ft-count">Number of pushes</label><input id="ft-count" type="number" value="6" min="1" max="30"></div>
+      <div class="field"><label for="ft-interval">Interval (ms)</label><input id="ft-interval" type="number" value="10000" min="1000" step="1000"></div>
+      <label class="row"><input id="ft-spoof" type="checkbox"> Spoof the victim’s device</label>
+      <div class="row" style="margin-top:10px">
+        <button class="danger" id="ft-start">Start spamming</button>
+        <button id="ft-stop">Stop all attacks</button>
+      </div>
+      <p id="ft-status" class="muted" role="status"></p>
+    </section>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <section class="card">
+      <h2>Push requests</h2>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Who</th><th>Source</th><th>Device</th><th>Code</th><th>Status</th></tr></thead><tbody id="push-rows"></tbody></table></div>
+    </section>
+    <section class="card">
+      <h2>Event feed</h2>
+      <ul id="feed" class="feed"></ul>
+    </section>
+  </div>
+</main>
+<script src="/js/domain-guard.js"></script>
+<script src="/js/push-guard.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = VG.esc;
+  let filled = false;
+
+  function fillSelects(s) {
+    const brands = Object.values(s.brandSets).flatMap((x) => [x.bank, x.pay]);
+    $('ph-target').innerHTML = brands.map((b) => `<option value="${b.domain}">${esc(b.name)} (${b.domain})</option>`).join('');
+    $('ph-target').value = s.brands.bank.domain;
+    $('ph-attack').innerHTML = DomainGuard.ATTACK_TYPES.map((t) => `<option>${t}</option>`).join('');
+    filled = true;
+    preview();
+  }
+
+  function preview() {
+    const s = VG.state;
+    const fake = DomainGuard.makeLookalike($('ph-target').value, $('ph-attack').value, Number($('ph-seed').value));
+    if (!fake) { $('ph-preview').textContent = 'This technique does not apply to that name. Try another variant.'; return; }
+    const a = DomainGuard.analyze('https://' + fake, s.trusted);
+    $('ph-preview').innerHTML = `<strong class="mono">${esc(fake)}</strong>
+      <span>Screen reader today: “${esc(DomainGuard.readAsScreenReader(DomainGuard.parse(fake).host))}”</span><br>
+      <span>VoiceGuard: “${esc(DomainGuard.announceLink(a))}”</span>`;
+  }
+  ['ph-target', 'ph-attack', 'ph-seed'].forEach((id) => $(id).addEventListener('input', preview));
+
+  $('ph-send').addEventListener('click', async () => {
+    try {
+      await VG.api('/api/email', { attack: $('ph-attack').value, target: $('ph-target').value, seed: Number($('ph-seed').value) });
+    } catch (e) { alert(e.message); }
+  });
+  $('cc-arm').addEventListener('click', async () => {
+    await VG.api('/api/attack/concurrent', { delayMs: Number($('cc-delay').value), spoofSame: $('cc-spoof').checked });
+  });
+  $('cc-now').addEventListener('click', async () => {
+    const b = VG.state.brands.bank;
+    await VG.api('/api/login', { actor: 'attacker', service: b.name, domain: b.domain, spoofSame: $('cc-spoof').checked, source: 'manual' });
+  });
+  $('ft-start').addEventListener('click', async () => {
+    await VG.api('/api/attack/fatigue', { count: Number($('ft-count').value), intervalMs: Number($('ft-interval').value), spoofSame: $('ft-spoof').checked });
+  });
+  $('ft-stop').addEventListener('click', () => VG.api('/api/attack/stop', {}));
+
+  VG.on('state', (s) => {
+    if (!filled) fillSelects(s);
+    $('cond').textContent = s.config.condition === 'guard' ? 'Victim has VoiceGuard' : 'Victim on baseline';
+    $('cond').className = 'pill ' + s.config.condition;
+    $('cc-status').textContent = s.attack.concurrent ? `Armed: fires ${s.attack.concurrent.delayMs} ms after the victim signs in.` : 'Not armed.';
+    $('ft-status').textContent = s.attack.fatigue ? `Spamming: ${s.attack.fatigue.sent} of ${s.attack.fatigue.count} sent.` : 'Idle.';
+    $('push-rows').innerHTML = s.pushes.slice().reverse().map((p) => `<tr>
+      <td class="mono">${p.id}</td><td>${p.actor}</td><td>${p.source || '—'}</td>
+      <td>${esc(PushGuard.deviceLabel(p.device))}, ${esc(p.device.location)}</td><td class="mono">${p.codeWord}</td>
+      <td><strong>${p.status}</strong></td></tr>`).join('') || '<tr><td colspan="6" class="muted">None yet</td></tr>';
+  });
+
+  function addFeed(e) {
+    const li = document.createElement('li');
+    if (['attack_success', 'phish_credentials_submitted'].includes(e.type)) li.className = 'hit';
+    const extra = Object.entries(e).filter(([k]) => !['t', 'type', 'participant', 'condition', 'block', 'taskRun', 'page'].includes(k) && e[k] != null)
+      .map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`).join(' ');
+    li.textContent = `${new Date(e.t).toLocaleTimeString()} ${e.type} ${extra}`;
+    $('feed').prepend(li);
+  }
+  VG.on('event', addFeed);
+  VG.api('/api/events').then((evs) => evs.forEach(addFeed));
+})();
+</script>
+</body>
+</html>

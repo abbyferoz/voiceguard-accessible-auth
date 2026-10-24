@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceGuard Results</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-page="results">
+<header class="topbar">
+  <a class="brand" href="/">Voice<span>Guard</span> · Results</a>
+  <div class="controls"><a class="btn" href="/study.html">Study runner</a><button id="refresh">Refresh</button></div>
+</header>
+<main>
+  <section class="card">
+    <h2>Automated evaluation (AWARE-style, no participants)</h2>
+    <div id="eval"><p class="muted">Loading…</p></div>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <h2>User study: attack success by condition</h2>
+    <div class="legend"><span><i style="background:var(--series-1)"></i>Baseline</span><span><i style="background:var(--series-2)"></i>VoiceGuard</span></div>
+    <div id="bars" class="bars"></div>
+  </section>
+
+  <div class="grid" style="margin-top:16px">
+    <section class="card"><h2>Summary table</h2><div id="summary" class="table-wrap"></div></section>
+    <section class="card"><h2>Questionnaires</h2><div id="qs" class="table-wrap"></div></section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h2>All task results</h2>
+    <div id="rows" class="table-wrap"></div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const pct = (x) => (x == null ? '—' : `${Math.round(x * 100)}%`);
+  const sec = (ms) => (ms == null ? '—' : `${(ms / 1000).toFixed(1)} s`);
+
+  function bar(label, value, cls, title) {
+    return `<div class="bar-row" title="${esc(title)}"><span>${label}</span>
+      <div class="bar-track"><div class="bar-fill ${cls}" style="width:${value == null ? 0 : Math.max(1, value * 100)}%"></div></div>
+      <span>${pct(value)}</span></div>`;
+  }
+
+  function renderEval(e) {
+    if (e.missing) { $('eval').innerHTML = '<p class="muted">Run <code>npm run eval</code> to generate results.</p>'; return; }
+    const ph = e.phishing;
+    $('eval').innerHTML = `
+      <div class="stats">
+        <div><div class="stat">${pct(ph.detectionRate)}</div><div class="stat-label">look-alikes detected (${ph.nAttacks} generated)</div></div>
+        <div><div class="stat">${pct(ph.falsePositiveRate)}</div><div class="stat-label">false alarms on ${ph.nLegit} legitimate domains</div></div>
+        <div><div class="stat">${pct(ph.baselineMeanSimilarity)}</div><div class="stat-label">spoken similarity today (paper: 100%)</div></div>
+        <div><div class="stat">${pct(ph.guardMeanSimilarity)}</div><div class="stat-label">spoken similarity with VoiceGuard</div></div>
+        <div><div class="stat">${ph.meanGuardSeconds.toFixed(1)} s</div><div class="stat-label">to hear the difference (vs ${ph.meanSpellSeconds.toFixed(1)} s spelling the whole name)</div></div>
+      </div>
+      <h3 style="margin-top:16px">By technique</h3>
+      <div class="legend"><span><i style="background:var(--series-1)"></i>Spoken similarity, screen reader today</span><span><i style="background:var(--series-2)"></i>Spoken similarity, VoiceGuard</span></div>
+      <div class="bars">${Object.entries(ph.byAttack).map(([k, v]) => `<div class="bar-group"><h3>${k} · detected ${pct(v.detectionRate)}</h3>
+        ${bar('Today', v.baselineSimilarity, 's1', `${k}: today ${pct(v.baselineSimilarity)}`)}
+        ${bar('VoiceGuard', v.guardSimilarity, 's2', `${k}: VoiceGuard ${pct(v.guardSimilarity)}`)}</div>`).join('')}</div>
+      ${e.push ? `<h3 style="margin-top:16px">Push guard checks</h3><ul>${e.push.checks.map((c) => `<li>${c.pass ? '✅' : '❌'} ${esc(c.name)}</li>`).join('')}</ul>` : ''}`;
+  }
+
+  function renderStudy(r) {
+    const B = r.byCondition.baseline, G = r.byCondition.guard;
+    $('bars').innerHTML = ['phishing', 'concurrent', 'fatigue'].map((t) => `<div class="bar-group"><h3>${t} (n = ${B.attack[t].n} / ${G.attack[t].n})</h3>
+      ${bar('Baseline', B.attack[t].rate, 's1', `${t} baseline: ${B.attack[t].successes}/${B.attack[t].n}`)}
+      ${bar('VoiceGuard', G.attack[t].rate, 's2', `${t} VoiceGuard: ${G.attack[t].successes}/${G.attack[t].n}`)}</div>`).join('')
+      + (r.rows.length ? '' : '<p class="muted">No study sessions recorded yet.</p>');
+    const line = (name, f) => `<tr><td>${name}</td><td>${f(B)}</td><td>${f(G)}</td></tr>`;
+    $('summary').innerHTML = `<table><thead><tr><th>Measure</th><th>Baseline</th><th>VoiceGuard</th></tr></thead><tbody>
+      ${line('Participants', (c) => c.participants)}
+      ${['phishing', 'concurrent', 'fatigue'].map((t) => line(`${t} attack success`, (c) => `${pct(c.attack[t].rate)} (${c.attack[t].successes}/${c.attack[t].n})`)).join('')}
+      ${['phishing', 'concurrent', 'fatigue'].map((t) => line(`${t} mean decision time`, (c) => sec(c.attack[t].meanDecisionMs))).join('')}
+      ${line('Legitimate sign-in success', (c) => pct(c.legit.successRate))}
+      ${line('Time to sign in (legit)', (c) => sec(c.legit.meanTimeToSignInMs))}
+      ${line('SUS (0–100)', (c) => (c.sus == null ? '—' : c.sus.toFixed(1)))}
+      ${line('Raw NASA-TLX', (c) => (c.tlx == null ? '—' : c.tlx.toFixed(1)))}</tbody></table>`;
+    $('qs').innerHTML = r.questionnaires.length ? `<table><thead><tr><th>Participant</th><th>Condition</th><th>SUS</th><th>TLX</th><th>Trust</th></tr></thead><tbody>${
+      r.questionnaires.map((q) => `<tr><td>${esc(q.participant)}</td><td>${q.condition}</td><td>${q.susScore ?? '—'}</td><td>${q.tlxRaw == null ? '—' : q.tlxRaw.toFixed(1)}</td><td>${q.trust ?? '—'}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">None yet.</p>';
+    $('rows').innerHTML = r.rows.length ? `<table><thead><tr><th>Participant</th><th>Block</th><th>Condition</th><th>Task</th><th>Outcome</th><th>Detail</th><th>Decision</th><th>Warnings</th></tr></thead><tbody>${
+      r.rows.map((x) => `<tr><td>${esc(x.participant)}</td><td>${x.block}</td><td>${x.condition}</td><td>${x.task}</td><td><strong>${x.outcome}</strong></td><td>${esc(x.detail)}</td><td>${sec(x.decisionMs)}</td><td>${x.warningsHeard}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">None yet.</p>';
+  }
+
+  async function load() {
+    const [e, r] = await Promise.all([fetch('/api/eval').then((x) => x.json()), fetch('/api/results').then((x) => x.json())]);
+    renderEval(e);
+    renderStudy(r);
+  }
+  $('refresh').addEventListener('click', load);
+  load();
+})();
+</script>
+</body>
+</html>
