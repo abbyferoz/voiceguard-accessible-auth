@@ -20,9 +20,10 @@
   const DEFAULTS = {
     windowMs: 120000,        // look-back window for the fatigue detector
     burstThreshold: 3,       // this many pushes inside the window = fatigue pattern
-    denyThreshold: 2,        // this many denials/timeouts inside the window = fatigue pattern
+    denyThreshold: 2,        // this many denials/timeouts inside denyWindowMs = fatigue pattern
+    denyWindowMs: 600000,    // longer look-back for refusals, to catch slow-drip spam
     cooldownMs: 300000,      // approvals stay locked this long after the last suspicious push
-    concurrentWindowMs: 45000, // two pending pushes this close together = concurrent login
+    concurrentWindowMs: 300000, // two pending pushes this close together = concurrent login
     baseExpiryMs: 60000,     // what deployed services typically allow
     actionBufferMs: 30000,   // time to find and press a button after listening
     wordsPerMinute: 180,     // speech-synthesis speed at rate 1.0 (screen reader default ~50%)
@@ -70,7 +71,8 @@
     const pending = sameAccount.filter((p) => p.status === 'pending');
     const others = pending.filter((p) => p.id !== push.id &&
       Math.abs(p.createdAt - push.createdAt) <= o.concurrentWindowMs);
-    const refused = recent.filter((p) => ['denied', 'reported', 'expired'].includes(p.status));
+    const refused = sameAccount.filter((p) => p.createdAt <= now && now - p.createdAt <= o.denyWindowMs &&
+      ['denied', 'reported', 'expired'].includes(p.status));
     const warnings = [];
 
     if (c.concurrency && others.length) {
@@ -85,14 +87,14 @@
     let locked = false;
     let lockedUntil = 0;
     if (c.fatigue && (recent.length >= o.burstThreshold || refused.length >= o.denyThreshold)) {
-      const last = Math.max(...recent.map((p) => p.createdAt));
+      const last = Math.max(...recent.concat(refused).map((p) => p.createdAt));
       lockedUntil = last + o.cooldownMs;
       locked = now < lockedUntil;
       warnings.push({
         type: 'fatigue',
         level: 'danger',
-        text: `Warning: ${recent.length} sign-in requests in the last ${Math.round(o.windowMs / 60000)} minutes` +
-          (refused.length ? `, and you refused ${refused.length}` : '') +
+        text: `Warning: ${recent.length} sign-in request${recent.length === 1 ? '' : 's'} in the last ${Math.round(o.windowMs / 60000)} minutes` +
+          (refused.length ? `, and ${refused.length} refused or missed in the last ${Math.round(o.denyWindowMs / 60000)} minutes` : '') +
           '. Attackers send many requests to wear you down. Approve is locked for now. ' +
           'If you did not just sign in, choose Report.',
       });

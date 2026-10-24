@@ -1,0 +1,463 @@
+{
+  "generatedAt": "2026-10-24T15:36:45.904Z",
+  "phishing": {
+    "nTrusted": 50,
+    "nAttacks": 1114,
+    "nLegit": 85,
+    "detectionRate": 0.9964093357271095,
+    "correctTargetRate": 0.9964093357271095,
+    "falsePositiveRate": 0,
+    "falseAlarms": [],
+    "baselineMeanSimilarity": 0.6884666383717375,
+    "guardMeanSimilarity": 0.48226278901023945,
+    "audiblyIdenticalBaseline": 0.21364452423698385,
+    "meanGuardSeconds": 4.09729729729731,
+    "meanAnnouncementSeconds": 10.645645645645656,
+    "meanSpellSeconds": 4.985038898862959,
+    "missed": [
+      {
+        "real": "hbl.com",
+        "fake": "hbbl.com",
+        "attack": "repetition"
+      },
+      {
+        "real": "hbl.com",
+        "fake": "hl.com",
+        "attack": "omission"
+      },
+      {
+        "real": "hbl.com",
+        "fake": "hvl.com",
+        "attack": "substitution"
+      },
+      {
+        "real": "hbl.com",
+        "fake": "hnl.com",
+        "attack": "substitution"
+      }
+    ],
+    "byAttack": {
+      "repetition": {
+        "n": 128,
+        "detectionRate": 0.9921875,
+        "correctTargetRate": 0.9921875,
+        "baselineSimilarity": 0.9937235532536981,
+        "guardSimilarity": 0.5350890403330701,
+        "audiblyIdenticalBaseline": 0.984375,
+        "diffSeconds": 3.79265091863517,
+        "spellSeconds": 4.244791666666668
+      },
+      "omission": {
+        "n": 122,
+        "detectionRate": 0.9918032786885246,
+        "correctTargetRate": 0.9918032786885246,
+        "baselineSimilarity": 0.6069731738834816,
+        "guardSimilarity": 0.4550971317184736,
+        "audiblyIdenticalBaseline": 0.00819672131147541,
+        "diffSeconds": 3.7988980716253433,
+        "spellSeconds": 3.5928961748633865
+      },
+      "transposition": {
+        "n": 112,
+        "detectionRate": 1,
+        "correctTargetRate": 1,
+        "baselineSimilarity": 0.46815744315739083,
+        "guardSimilarity": 0.4529682577566813,
+        "audiblyIdenticalBaseline": 0,
+        "diffSeconds": 3,
+        "spellSeconds": 3.9821428571428585
+      },
+      "substitution": {
+        "n": 139,
+        "detectionRate": 0.9856115107913669,
+        "correctTargetRate": 0.9856115107913669,
+        "baselineSimilarity": 0.5292784829798809,
+        "guardSimilarity": 0.4167197840791426,
+        "audiblyIdenticalBaseline": 0,
+        "diffSeconds": 5,
+        "spellSeconds": 3.817745803357313
+      },
+      "homoglyph": {
+        "n": 106,
+        "detectionRate": 1,
+        "correctTargetRate": 1,
+        "baselineSimilarity": 0.5307824397806059,
+        "guardSimilarity": 0.5265840284611032,
+        "audiblyIdenticalBaseline": 0,
+        "diffSeconds": 3.5786163522012546,
+        "spellSeconds": 4.204402515723272
+      },
+      "homoglyph-unicode": {
+        "n": 111,
+        "detectionRate": 1,
+        "correctTargetRate": 1,
+        "baselineSimilarity": 1,
+        "guardSimilarity": 0.5449741017205397,
+        "audiblyIdenticalBaseline": 1,
+        "diffSeconds": 3,
+        "spellSeconds": 3.942942942942944
+      },
+      "tld-swap": {
+        "n": 123,
+        "detectionRate": 1,
+        "correctTargetRate": 1,
+        "baselineSimilarity": 0.7789914455281821,
+        "guardSimilarity": 0.5131378655602442,
+        "audiblyIdenticalBaseline": 0,
+        "diffSeconds": 4.3604336043360385,
+        "spellSeconds": 3.910569105691058
+      },
+      "combosquat": {
+        "n": 123,
+        "detectionRate": 1,
+        "correctTargetRate": 1,
+        "baselineSimilarity": 0.7312737376319853,
+        "guardSimilarity": 0.5554301692879443,
+        "audiblyIdenticalBaseline": 0,
+        "diffSeconds": 2.333333333333335,
+        "spellSeconds": 6.170731707317075
+      },
+      "brand-in-subdomain": {
+        "n": 150,
+        "detectionRate": 1,
+        "correctTargetRate": 1,
+        "baselineSimilarity": 0.5778372946838826,
+        "guardSimilarity": 0.37884736183457735,
+        "audiblyIdenticalBaseline": 0,
+        "diffSeconds": 7,
+        "spellSeconds": 9.811111111111112
+      }
+    },
+    "paperPairs": [
+      {
+        "real": "bankofamerica.com",
+        "fake": "bankoffamerica.com",
+        "baselineHeardReal": "bankofamerika dot kom",
+        "baselineHeardFake": "bankofamerika dot kom",
+        "baselineSimilarity": 1,
+        "guardSimilarity": 0.6037981898725817,
+        "guardSays": "Warning! Look-alike link. It goes to bankoffamerica dot com, not bankofamerica dot com. It has a double F, as in Foxtrot, after N, K, O. This is likely a phishing site."
+      },
+      {
+        "real": "wellsfargo.com",
+        "fake": "wellssfargo.com",
+        "baselineHeardReal": "welsfargo dot kom",
+        "baselineHeardFake": "welsfargo dot kom",
+        "baselineSimilarity": 1,
+        "guardSimilarity": 0.5947601518676205,
+        "guardSays": "Warning! Look-alike link. It goes to wellssfargo dot com, not wellsfargo dot com. It has a double S, as in Sierra, after E, L, L. This is likely a phishing site."
+      }
+    ]
+  },
+  "push": {
+    "concurrent": [
+      {
+        "delayS": 0,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 0,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 1,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 1,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 2.5,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 2.5,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 5,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 5,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 10,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 10,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 30,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 30,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 60,
+        "spoofedDevice": false,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": true,
+        "distinguishableByContextOnly": true,
+        "codeWordMismatch": true
+      },
+      {
+        "delayS": 60,
+        "spoofedDevice": true,
+        "baselineShows": "attacker",
+        "guardShows": 2,
+        "concurrencyWarning": true,
+        "newDeviceWarning": false,
+        "distinguishableByContextOnly": false,
+        "codeWordMismatch": true
+      }
+    ],
+    "fatigue": [
+      {
+        "intervalS": 5,
+        "userDenies": true,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 5,
+        "userDenies": false,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 10,
+        "userDenies": true,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 10,
+        "userDenies": false,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 30,
+        "userDenies": true,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 30,
+        "userDenies": false,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 60,
+        "userDenies": true,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 60,
+        "userDenies": false,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 90,
+        "userDenies": true,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 90,
+        "userDenies": false,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 300,
+        "userDenies": true,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 300,
+        "userDenies": false,
+        "firstWarnedPush": 3,
+        "approveLockedFromPush": 3
+      },
+      {
+        "intervalS": 900,
+        "userDenies": true,
+        "firstWarnedPush": null,
+        "approveLockedFromPush": null
+      },
+      {
+        "intervalS": 900,
+        "userDenies": false,
+        "firstWarnedPush": null,
+        "approveLockedFromPush": null
+      }
+    ],
+    "expiry": [
+      {
+        "rate": 0.75,
+        "baselineWords": 10,
+        "baselineListenS": 4.4,
+        "guardWords": 57,
+        "guardListenS": 25.3,
+        "guardExpiryS": 81,
+        "fixedExpiryS": 60
+      },
+      {
+        "rate": 1,
+        "baselineWords": 10,
+        "baselineListenS": 3.3,
+        "guardWords": 57,
+        "guardListenS": 19,
+        "guardExpiryS": 68,
+        "fixedExpiryS": 60
+      },
+      {
+        "rate": 1.25,
+        "baselineWords": 10,
+        "baselineListenS": 2.7,
+        "guardWords": 57,
+        "guardListenS": 15.2,
+        "guardExpiryS": 60,
+        "fixedExpiryS": 60
+      },
+      {
+        "rate": 1.5,
+        "baselineWords": 10,
+        "baselineListenS": 2.2,
+        "guardWords": 57,
+        "guardListenS": 12.7,
+        "guardExpiryS": 60,
+        "fixedExpiryS": 60
+      },
+      {
+        "rate": 2,
+        "baselineWords": 10,
+        "baselineListenS": 1.7,
+        "guardWords": 57,
+        "guardListenS": 9.5,
+        "guardExpiryS": 60,
+        "fixedExpiryS": 60
+      }
+    ],
+    "checks": [
+      {
+        "name": "Baseline: attacker push hides the victim push whenever it arrives second",
+        "pass": true
+      },
+      {
+        "name": "VoiceGuard: concurrency warning for every race while the victim request is still pending",
+        "pass": true
+      },
+      {
+        "name": "VoiceGuard: a spoofed device defeats context details alone (code word still differs)",
+        "pass": true
+      },
+      {
+        "name": "Fatigue: warned and locked by the 3rd push at intervals of 5 s to 5 min",
+        "pass": true
+      },
+      {
+        "name": "Fatigue limitation: a very slow drip (one push every 15 min) is not detected",
+        "pass": true
+      },
+      {
+        "name": "Normal single sign-in: no warnings, not locked",
+        "pass": true
+      },
+      {
+        "name": "User retries after a timeout: no concurrency warning",
+        "pass": true
+      },
+      {
+        "name": "Adaptive expiry always leaves time to hear the warning twice plus 30 s",
+        "pass": true
+      }
+    ]
+  }
+}

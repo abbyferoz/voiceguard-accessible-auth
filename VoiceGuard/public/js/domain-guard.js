@@ -182,10 +182,10 @@
       return { ...base, attack: 'userinfo-trick', confidence: 0.95 };
     }
     const subTokens = p.subdomain ? p.subdomain.split(/[.-]/) : [];
-    if (t.label.length >= 4 && (subTokens.includes(t.label) || p.subdomain.includes(t.registrable))) {
+    if ((t.label.length >= 3 && subTokens.includes(t.label)) || (p.subdomain && p.subdomain.includes(t.registrable))) {
       return { ...base, attack: 'brand-in-subdomain', confidence: 0.9 };
     }
-    if (p.label === t.label && p.suffix !== t.suffix && t.label.length >= 4) {
+    if (p.label === t.label && p.suffix !== t.suffix && t.label.length >= 3) {
       return { ...base, attack: 'tld-swap', confidence: 0.85, fromSuffix: t.suffix, toSuffix: p.suffix };
     }
     if (p.label !== t.label && skeleton(p.label) === skeleton(t.label)) {
@@ -213,9 +213,10 @@
         return { ...base, attack, confidence: 0.9 - 0.1 * (distance - 1), ops, distance };
       }
     }
-    if (t.label.length >= 4 && p.label !== t.label) {
+    if (t.label.length >= 3 && p.label !== t.label) {
       const tokens = p.label.split('-');
-      if (tokens.includes(t.label) || p.label.startsWith(t.label) || p.label.endsWith(t.label)) {
+      const affix = t.label.length >= 5 && (p.label.startsWith(t.label) || p.label.endsWith(t.label));
+      if (tokens.includes(t.label) || affix) {
         const extra = p.label.replace(t.label, '').replace(/^-+|-+$/g, '').replace(/-+/g, ' ');
         return { ...base, attack: 'combosquat', confidence: 0.75, extra };
       }
