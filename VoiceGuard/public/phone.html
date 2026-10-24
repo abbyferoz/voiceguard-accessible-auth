@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body data-page="phone">
-<div id="audio-gate" class="audio-gate" data-welcome="Phone ready. No sign-in requests.">
+<div id="audio-gate" class="audio-gate" data-welcome="Phone ready.">
   <div class="card">
     <h1>Participant phone</h1>
     <p>Open this page on a real phone (with VoiceOver or TalkBack) or keep it in a second window.</p>
@@ -193,6 +193,8 @@
   });
 
   VG.on('state', render);
+  // Requests that arrived before audio was switched on are announced again.
+  document.addEventListener('vg-audio-ready', () => { announced.clear(); setTimeout(render, 1500); });
 
   setInterval(() => {
     document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

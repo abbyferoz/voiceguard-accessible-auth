@@ -316,7 +316,7 @@ function scoreTask(task, events, pushes) {
     const firstAction = first(events.filter((e) => ['phish_link_activated', 'interstitial_back', 'mail_reported',
       'mail_deleted', 'phish_credentials_submitted'].includes(e.type)));
     row.outcome = submitted ? 'attack_success' : 'resisted';
-    row.detail = [opened && 'opened_link', submitted && 'submitted_credentials',
+    row.detail = [ev('interstitial_back').length && 'went_back_from_warning', opened && 'opened_link', submitted && 'submitted_credentials',
       attackerApproved && 'approved_relay_push', row.reported && 'reported'].filter(Boolean).join(';') || 'ignored';
     if (mailOpened && firstAction) row.decisionMs = firstAction.t - mailOpened.t;
   } else if (task.attack === 'concurrent' || task.attack === 'fatigue') {

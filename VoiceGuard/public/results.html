@@ -38,6 +38,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const pct = (x) => (x == null ? '—' : `${Math.round(x * 100)}%`);
+  const pct1 = (x) => (x == null ? '—' : `${(x * 100).toFixed(1)}%`);
   const sec = (ms) => (ms == null ? '—' : `${(ms / 1000).toFixed(1)} s`);
 
   function bar(label, value, cls, title) {
@@ -51,10 +52,11 @@
     const ph = e.phishing;
     $('eval').innerHTML = `
       <div class="stats">
-        <div><div class="stat">${pct(ph.detectionRate)}</div><div class="stat-label">look-alikes detected (${ph.nAttacks} generated)</div></div>
-        <div><div class="stat">${pct(ph.falsePositiveRate)}</div><div class="stat-label">false alarms on ${ph.nLegit} legitimate domains</div></div>
-        <div><div class="stat">${pct(ph.baselineMeanSimilarity)}</div><div class="stat-label">spoken similarity today (paper: 100%)</div></div>
-        <div><div class="stat">${pct(ph.guardMeanSimilarity)}</div><div class="stat-label">spoken similarity with VoiceGuard</div></div>
+        <div><div class="stat">${pct1(ph.detectionRate)}</div><div class="stat-label">look-alikes detected (${ph.nAttacks} generated)</div></div>
+        <div><div class="stat">${pct1(ph.falsePositiveRate)}</div><div class="stat-label">false alarms on ${ph.nLegit} legitimate domains</div></div>
+        <div><div class="stat">${pct(ph.paperPairs[0].baselineSimilarity)} → ${pct(ph.paperPairs[0].guardSimilarity)}</div><div class="stat-label">paper’s bankofamerica / bankoffamerica pair, today → VoiceGuard</div></div>
+        <div><div class="stat">${pct(ph.baselineMeanSimilarity)}</div><div class="stat-label">mean spoken similarity today, all techniques</div></div>
+        <div><div class="stat">${pct(ph.guardMeanSimilarity)}</div><div class="stat-label">mean spoken similarity with VoiceGuard</div></div>
         <div><div class="stat">${ph.meanGuardSeconds.toFixed(1)} s</div><div class="stat-label">to hear the difference (vs ${ph.meanSpellSeconds.toFixed(1)} s spelling the whole name)</div></div>
       </div>
       <h3 style="margin-top:16px">By technique</h3>

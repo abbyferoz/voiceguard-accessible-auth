@@ -104,7 +104,7 @@
   }
 
   function showInterstitial(url, a) {
-    const text = DomainGuard.announcePage(a);
+    const text = `Blocked. ${DomainGuard.announceLink(a)}`;
     document.getElementById('int-desc').textContent = text;
     dialog.dataset.url = url;
     dialog.showModal();

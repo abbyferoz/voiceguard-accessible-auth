@@ -158,3 +158,5 @@ dialog .inner { padding: 20px; border-top: 8px solid var(--danger); }
 .feed { list-style: none; margin: 0; padding: 0; font-family: var(--mono); font-size: .78rem; max-height: 320px; overflow: auto; }
 .feed li { padding: 3px 0; border-bottom: 1px dashed var(--line); }
 .feed li.hit { color: var(--danger); font-weight: 700; }
+input[type="checkbox"], input[type="radio"] { padding: 0; width: auto; flex: none; }
+label.row { flex-wrap: nowrap; font-weight: 500; }
