@@ -86,7 +86,7 @@ AWARE is a semi-automated precursor to user studies, so we first evaluated Voice
 | Unicode homoglyph (`pаypal`, Cyrillic а) | 100% | 100% | 54.5% |
 | TLD swap | 100% | 77.9% | 51.3% |
 | Combosquat (`paypal-login`) | 100% | 73.1% | 55.5% |
-| Brand in subdomain | 98.0% | 57.8% | 37.5% |
+| Brand in subdomain | 100% | 57.8% | 37.9% |
 
 **Push-abuse checks.** We replayed attack schedules through the push guard, and all 8 checks pass:
 

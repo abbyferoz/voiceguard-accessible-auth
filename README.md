@@ -19,3 +19,5 @@ The project builds on *Broken Access: On the Challenges of Screen Reader Assiste
 | `broken-access-presentation (1).pptx` | Our presentation of the paper |
 | `VoiceGuard/` | The running application, tests and automated evaluation |
 | `VoiceGuard_Experimental_Plan.docx` | How we will run the experiments |
+| `VoiceGuard_Final_Report.docx` | Problems, our solution and findings |
+| `docs/` | Text sources of the report and the plan |
