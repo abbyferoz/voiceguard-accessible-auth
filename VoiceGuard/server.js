@@ -413,7 +413,7 @@ function send(res, code, body, type) {
 function readBody(req) {
   return new Promise((resolve) => {
     let data = '';
-    req.on('data', (c) => { data += c; if (data.length > 1e6) req.destroy(); });
+    req.on('data', (c) => { data += c; if (data.length > 1e6) { resolve({}); req.destroy(); } });
     req.on('end', () => { try { resolve(data ? JSON.parse(data) : {}); } catch (e) { resolve({}); } });
   });
 }
@@ -533,7 +533,9 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method !== 'GET') return send(res, 404, { error: 'not found' });
 
-  const file = path.normalize(path.join(PUBLIC, p === '/' ? 'index.html' : decodeURIComponent(p)));
+  let decoded = p;
+  try { decoded = decodeURIComponent(p); } catch (e) { return send(res, 400, { error: 'bad request' }); }
+  const file = path.normalize(path.join(PUBLIC, p === '/' ? 'index.html' : decoded));
   if (!file.startsWith(PUBLIC)) return send(res, 403, 'forbidden', 'text/plain');
   fs.readFile(file, (err, buf) => {
     if (err) return send(res, 404, 'not found', 'text/plain');
