@@ -8,7 +8,7 @@
 </head>
 <body data-page="results">
 <header class="topbar">
-  <a class="brand" href="/">Voice<span>Guard</span> · Results</a>
+  <a class="brand" href="/">Voice<span>Guard</span><span class="page-name">Results</span></a>
   <div class="controls"><a class="btn" href="/study.html">Study runner</a><button id="refresh">Refresh</button></div>
 </header>
 <main>
@@ -17,18 +17,18 @@
     <div id="eval"><p class="muted">Loading…</p></div>
   </section>
 
-  <section class="card" style="margin-top:16px">
+  <section class="card stack-top">
     <h2>User study: attack success by condition</h2>
     <div class="legend"><span><i style="background:var(--series-1)"></i>Baseline</span><span><i style="background:var(--series-2)"></i>VoiceGuard</span></div>
     <div id="bars" class="bars"></div>
   </section>
 
-  <div class="grid" style="margin-top:16px">
+  <div class="grid stack-top">
     <section class="card"><h2>Summary table</h2><div id="summary" class="table-wrap"></div></section>
     <section class="card"><h2>Questionnaires</h2><div id="qs" class="table-wrap"></div></section>
   </div>
 
-  <section class="card" style="margin-top:16px">
+  <section class="card stack-top">
     <h2>All task results</h2>
     <div id="rows" class="table-wrap"></div>
   </section>
@@ -61,7 +61,7 @@
       </div>
       <h3 style="margin-top:16px">By technique</h3>
       <div class="legend"><span><i style="background:var(--series-1)"></i>Spoken similarity, screen reader today</span><span><i style="background:var(--series-2)"></i>Spoken similarity, VoiceGuard</span></div>
-      <div class="bars">${Object.entries(ph.byAttack).map(([k, v]) => `<div class="bar-group"><h3>${k} · detected ${pct(v.detectionRate)}</h3>
+      <div class="bars">${Object.entries(ph.byAttack).map(([k, v]) => `<div class="bar-group"><h3>${k}: ${pct(v.detectionRate)} detected</h3>
         ${bar('Today', v.baselineSimilarity, 's1', `${k}: today ${pct(v.baselineSimilarity)}`)}
         ${bar('VoiceGuard', v.guardSimilarity, 's2', `${k}: VoiceGuard ${pct(v.guardSimilarity)}`)}</div>`).join('')}</div>
       ${e.push ? `<h3 style="margin-top:16px">Push guard checks</h3><ul>${e.push.checks.map((c) => `<li>${c.pass ? '✅' : '❌'} ${esc(c.name)}</li>`).join('')}</ul>` : ''}`;

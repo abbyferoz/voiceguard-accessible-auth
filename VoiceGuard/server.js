@@ -11,6 +11,7 @@
 'use strict';
 
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -149,7 +150,11 @@ function changed() { broadcast({ kind: 'state', state: publicState() }); }
 // ---------------------------------------------------------------------------
 function createLogin({ actor, service, domain, device, source }) {
   const now = Date.now();
-  const codeWord = CODE_WORDS[Math.floor(Math.random() * CODE_WORDS.length)];
+  // Voice approval matches on the spoken code word, so no two waiting requests may share one.
+  const inUse = new Set(state.pushes.filter((p) => p.status === 'pending').map((p) => p.codeWord));
+  const free = CODE_WORDS.filter((w) => !inUse.has(w));
+  const pool = free.length ? free : CODE_WORDS;
+  const codeWord = pool[Math.floor(Math.random() * pool.length)];
   const session = { id: nextId('s'), actor, service, domain, device, codeWord, status: 'pending', createdAt: now };
   const push = {
     id: nextId('p'), account: ACCOUNT, sessionId: session.id, actor, service, domain, device,
@@ -501,7 +506,7 @@ const routes = {
   },
 };
 
-const server = http.createServer(async (req, res) => {
+async function handle(req, res) {
   const url = new URL(req.url, 'http://x');
   const p = url.pathname;
 
@@ -541,11 +546,25 @@ const server = http.createServer(async (req, res) => {
     if (err) return send(res, 404, 'not found', 'text/plain');
     send(res, 200, buf, MIME[path.extname(file)] || 'application/octet-stream');
   });
-});
+}
+
+const server = http.createServer(handle);
+
+// Browsers only allow the microphone (voice answers) on HTTPS pages, so when a
+// certificate is present the same app is also served over HTTPS.
+const CERT_DIR = path.join(__dirname, 'certs');
+const HTTPS_PORT = Number(process.env.HTTPS_PORT) || 3443;
+const hasCert = fs.existsSync(path.join(CERT_DIR, 'key.pem')) && fs.existsSync(path.join(CERT_DIR, 'cert.pem'));
 
 resetWorld();
 server.listen(PORT, '0.0.0.0', () => {
   const lan = Object.values(os.networkInterfaces()).flat().find((i) => i && i.family === 'IPv4' && !i.internal);
   console.log(`VoiceGuard running at http://localhost:${PORT}`);
   if (lan) console.log(`On a phone on the same Wi-Fi, open http://${lan.address}:${PORT}/phone.html`);
+  if (hasCert) {
+    https.createServer({ key: fs.readFileSync(path.join(CERT_DIR, 'key.pem')), cert: fs.readFileSync(path.join(CERT_DIR, 'cert.pem')) }, handle)
+      .listen(HTTPS_PORT, '0.0.0.0', () => {
+        console.log(`HTTPS (needed for voice answers): https://${lan ? lan.address : 'localhost'}:${HTTPS_PORT}/phone.html`);
+      });
+  }
 });

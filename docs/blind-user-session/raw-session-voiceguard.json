@@ -1,0 +1,1492 @@
+{
+  "condition": "guard",
+  "participant": "P02",
+  "base": "http://localhost:3100",
+  "startedAt": 1795446529298,
+  "summary": [
+    {
+      "task": "legit_email",
+      "condition": "guard",
+      "outcome": "legit_success",
+      "detail": "signed_in",
+      "warningsHeard": 0,
+      "decisionMs": 2078,
+      "durationMs": 7312
+    },
+    {
+      "task": "legit_login",
+      "condition": "guard",
+      "outcome": "legit_success",
+      "detail": "signed_in",
+      "warningsHeard": 0,
+      "decisionMs": 2072,
+      "durationMs": 5211
+    },
+    {
+      "task": "phish_typo",
+      "condition": "guard",
+      "outcome": "resisted",
+      "detail": "went_back_from_warning;reported",
+      "warningsHeard": 2,
+      "decisionMs": 1801,
+      "durationMs": 6276
+    },
+    {
+      "task": "phish_subdomain",
+      "condition": "guard",
+      "outcome": "resisted",
+      "detail": "went_back_from_warning;reported",
+      "warningsHeard": 2,
+      "decisionMs": 1800,
+      "durationMs": 6267
+    },
+    {
+      "task": "concurrent",
+      "condition": "guard",
+      "outcome": "resisted",
+      "detail": "approved_own;reported",
+      "warningsHeard": 1,
+      "decisionMs": 4311,
+      "durationMs": 8800,
+      "pushesSent": 1
+    },
+    {
+      "task": "fatigue",
+      "condition": "guard",
+      "outcome": "resisted",
+      "detail": "no_approval",
+      "warningsHeard": 5,
+      "decisionMs": 1459,
+      "durationMs": 59123,
+      "pushesSent": 6
+    }
+  ],
+  "actions": [
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://mail.campusmail.edu/inbox \"Campus Mailmail.campusmail.edu\"",
+      "t": 6472
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open Campus Mail bookmark",
+      "t": 6472
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON m51 \"statements@northwindbank.comUnread. Your Northwind Bank statement is ready\"",
+      "t": 7206
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the message",
+      "t": 7206
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "A https://northwindbank.com/statements \"View your statement\"",
+      "t": 7999
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — follow the statement link",
+      "t": 8401
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 9320
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 9320
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 9418
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 9418
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve\"",
+      "t": 11498
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the sign-in request",
+      "t": 11498
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://contosopay.com/login \"Contoso Paycontosopay.com\"",
+      "t": 14158
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the payment app bookmark",
+      "t": 14158
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 15065
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 15065
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 15156
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 15156
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve\"",
+      "t": 17228
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the sign-in request",
+      "t": 17228
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://mail.campusmail.edu/inbox \"Campus Mailmail.campusmail.edu\"",
+      "t": 19738
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open Campus Mail bookmark",
+      "t": 19738
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON m62 \"security@northwiindbank.comUnread. Northwind Bank: unusual sign-in detected\"",
+      "t": 20447
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the message",
+      "t": 20447
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "A https://northwiindbank.com/verify \"Confirm your identity\"",
+      "t": 21239
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — activate the link despite the warning",
+      "t": 22250
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Go back to safety\"",
+      "t": 23164
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — \"Go back to safety\"",
+      "t": 23164
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Report as phishing\"",
+      "t": 24216
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — report the email as phishing",
+      "t": 24216
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://mail.campusmail.edu/inbox \"Campus Mailmail.campusmail.edu\"",
+      "t": 26532
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open Campus Mail bookmark",
+      "t": 26532
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON m66 \"refunds@auth-check.siteUnread. Contoso Pay: you have a refund of Rs 4,500\"",
+      "t": 27242
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the message",
+      "t": 27242
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "A https://contosopay.com.auth-check.site/refund \"Claim your refund\"",
+      "t": 28033
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — activate the link despite the warning",
+      "t": 29043
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Go back to safety\"",
+      "t": 29954
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — \"Go back to safety\"",
+      "t": 29954
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Report as phishing\"",
+      "t": 31004
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — report the email as phishing",
+      "t": 31004
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://northwindbank.com/login \"Northwind Banknorthwindbank.com\"",
+      "t": 33397
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the bank bookmark",
+      "t": 33397
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 34307
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 34307
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 34398
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 34398
+    },
+    {
+      "device": "PC",
+      "action": "note",
+      "detail": "code word heard on the computer: ROCKET",
+      "t": 38554
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve\"",
+      "t": 38709
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the request whose code word is ROCKET",
+      "t": 38709
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON report \"Report: this wasn’t me\"",
+      "t": 40221
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — report the other request",
+      "t": 40221
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"Deny\"",
+      "t": 48106
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 48106
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON read-all \"Read all waiting requests (1)\"",
+      "t": 58850
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — \"Read all waiting requests\"",
+      "t": 58850
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"Deny\"",
+      "t": 60664
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 60664
+    },
+    {
+      "device": "PHONE",
+      "action": "note",
+      "detail": "Approve is locked on this request",
+      "t": 67895
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve (locked)\"",
+      "t": 68047
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — try to approve the locked request",
+      "t": 68047
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"Deny\"",
+      "t": 68833
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 68833
+    },
+    {
+      "device": "PHONE",
+      "action": "note",
+      "detail": "Approve is locked on this request",
+      "t": 77908
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve (locked)\"",
+      "t": 78060
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — try to approve the locked request",
+      "t": 78060
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"Deny\"",
+      "t": 78844
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 78844
+    },
+    {
+      "device": "PHONE",
+      "action": "note",
+      "detail": "Approve is locked on this request",
+      "t": 87921
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve (locked)\"",
+      "t": 88069
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — try to approve the locked request",
+      "t": 88069
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"Deny\"",
+      "t": 88854
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 88854
+    },
+    {
+      "device": "PHONE",
+      "action": "note",
+      "detail": "Approve is locked on this request",
+      "t": 97908
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Approve (locked)\"",
+      "t": 98060
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — try to approve the locked request",
+      "t": 98060
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"Deny\"",
+      "t": 98849
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 98849
+    }
+  ],
+  "rec": [
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 4639,
+      "text": "Start and turn on audio"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 4639,
+      "level": "",
+      "text": "08:08:53 PM Computer ready. You are on the start page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 4641,
+      "text": "Start and turn on audio"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 4641,
+      "level": "",
+      "text": "08:08:53 PM Phone ready."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 5192,
+      "text": "You have a new email from your bank about your monthly statement. Open it and sign in to see the statement."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "VoiceGuardComputer"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Built-in voice My screen reader Both Silent (transcript only)"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Back"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Start page"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "statements@northwindbank.comUnread. Your Northwind Bank statement is ready"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 11340,
+      "level": "",
+      "text": "08:08:55 PM Verified site: mail dot campusmail dot edu. Inbox. 3 messages, 1 unread."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 11340,
+      "level": "",
+      "text": "08:08:56 PM Message from statements. Subject: Your Northwind Bank statement is ready. Your monthly statement for October is ready. Sign in to Northwind Bank to view it."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 11340,
+      "level": "",
+      "text": "08:08:57 PM Link. View your statement. Goes to northwindbank dot com. Verified site."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "View your statement"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 11340,
+      "level": "",
+      "text": "08:08:57 PM Verified site: northwindbank dot com. Northwind Bank, sign in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 11340,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 11340,
+      "level": "",
+      "text": "08:08:58 PM Check your phone. Your code word is COFFEE. Again: COFFEE. Only approve a request that carries that code word. This request comes from Chrome on Windows, near Karachi."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 11342,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 11342,
+      "level": "",
+      "text": "08:08:58 PM Sign-in request for Northwind Bank. From Chrome on Windows, near Karachi, started just now. Code word: COFFEE. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 13013,
+      "level": "",
+      "text": "08:09:00 PM Signed in. Welcome back to Northwind Bank."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 13017,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 13017,
+      "text": "Approve"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 13017,
+      "level": "",
+      "text": "08:09:00 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 13023,
+      "text": "Sign in to your payment app using the bookmark on the start page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 17070,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 17070,
+      "text": "Northwind Banknorthwindbank.com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 17070,
+      "text": "Contoso Paycontosopay.com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 17070,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 17070,
+      "level": "",
+      "text": "08:09:03 PM Verified site: contosopay dot com. Contoso Pay, sign in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 17070,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 17070,
+      "level": "",
+      "text": "08:09:04 PM Check your phone. Your code word is MANGO. Again: MANGO. Only approve a request that carries that code word. This request comes from Chrome on Windows, near Karachi."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 17072,
+      "text": "Contoso Pay"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 17072,
+      "level": "",
+      "text": "08:09:04 PM Sign-in request for Contoso Pay. From Chrome on Windows, near Karachi, started just now. Code word: MANGO. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 18745,
+      "level": "",
+      "text": "08:09:06 PM Signed in. Welcome back to Contoso Pay."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 18748,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 18748,
+      "text": "Approve"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 18748,
+      "level": "",
+      "text": "08:09:06 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 18753,
+      "text": "Your bank has emailed you about a security check on your account. Deal with it the way you normally would."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 22246,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 22246,
+      "text": "security@northwiindbank.comUnread. Northwind Bank: unusual sign-in detected"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 22246,
+      "level": "",
+      "text": "08:09:09 PM Verified site: mail dot campusmail dot edu. Inbox. 3 messages, 1 unread."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 22246,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 22246,
+      "level": "",
+      "text": "08:09:09 PM Message from security. Subject: Northwind Bank: unusual sign-in detected. We noticed an unusual sign-in to your Northwind Bank account. Please confirm your identity within 24 hours to avoid suspension."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 22246,
+      "level": "danger",
+      "text": "08:09:10 PM Warning! Look-alike link. Confirm your identity. It goes to northwiindbank dot com, not northwindbank dot com. It has a double I, as in India, after T, H, W. This is likely a phishing site."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 22246,
+      "text": "Confirm your identity"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 23162,
+      "text": "Go back to safety"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 23162,
+      "level": "danger",
+      "text": "08:09:11 PM Blocked. Look-alike website. Press Enter to go back to safety."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 23980,
+      "text": "Confirm your identity"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 23980,
+      "level": "danger",
+      "text": "08:09:12 PM Warning. Look-alike link. It goes to northwiindbank dot com, not northwindbank dot com."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 23980,
+      "level": "",
+      "text": "08:09:12 PM You stayed safe. Back on the previous page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 25027,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 25027,
+      "level": "danger",
+      "text": "08:09:13 PM Warning. Look-alike link. It goes to northwiindbank dot com, not northwindbank dot com."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 25027,
+      "text": "Confirm your identity"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 25027,
+      "text": "Report as phishing"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 25027,
+      "level": "",
+      "text": "08:09:13 PM Reported as phishing and removed. Thank you."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 25546,
+      "text": "Your payment app has emailed you about a refund. Deal with it the way you normally would."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 29040,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 29040,
+      "text": "refunds@auth-check.siteUnread. Contoso Pay: you have a refund of Rs 4,500"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 29040,
+      "level": "",
+      "text": "08:09:15 PM Verified site: mail dot campusmail dot edu. Inbox. 3 messages, 1 unread."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 29040,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 29040,
+      "level": "",
+      "text": "08:09:16 PM Message from refunds. Subject: Contoso Pay: you have a refund of Rs 4,500. A refund of Rs 4,500 is waiting for you. Sign in to Contoso Pay to claim it before it expires."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 29040,
+      "level": "danger",
+      "text": "08:09:17 PM Warning! Look-alike link. Claim your refund. It goes to auth dash check dot site, not contosopay dot com. The name contosopay is only put at the front of the address to trick you. This is likely a phishing site."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 29040,
+      "text": "Claim your refund"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 29952,
+      "text": "Go back to safety"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 29952,
+      "level": "danger",
+      "text": "08:09:18 PM Blocked. Look-alike website. Press Enter to go back to safety."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 30764,
+      "text": "Claim your refund"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 30764,
+      "level": "danger",
+      "text": "08:09:19 PM Warning. Look-alike link. It goes to auth dash check dot site, not contosopay dot com."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 30764,
+      "level": "",
+      "text": "08:09:19 PM You stayed safe. Back on the previous page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 31811,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 31811,
+      "level": "danger",
+      "text": "08:09:20 PM Warning. Look-alike link. It goes to auth dash check dot site, not contosopay dot com."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 31811,
+      "text": "Claim your refund"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 31811,
+      "text": "Report as phishing"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 31811,
+      "level": "",
+      "text": "08:09:20 PM Reported as phishing and removed. Thank you."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 32333,
+      "text": "Sign in to your bank using the bookmark on the start page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 38549,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 38549,
+      "text": "Northwind Banknorthwindbank.com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 38549,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 38549,
+      "level": "",
+      "text": "08:09:22 PM Verified site: northwindbank dot com. Northwind Bank, sign in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 38549,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 38549,
+      "level": "",
+      "text": "08:09:23 PM Check your phone. Your code word is ROCKET. Again: ROCKET. Only approve a request that carries that code word. This request comes from Chrome on Windows, near Karachi."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 38552,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 38552,
+      "level": "",
+      "text": "08:09:23 PM Sign-in request for Northwind Bank. From Chrome on Windows, near Karachi, started just now. Code word: ROCKET. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 38552,
+      "text": "Northwind Bank, request 1 of 2"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 38552,
+      "level": "danger",
+      "text": "08:09:26 PM Sign-in request 2 of 2 for Northwind Bank. From Chrome on Windows, near Karachi, started just now. Code word: BRIDGE. Caution: 2 sign-in requests are waiting at the same time. Only one can be yours. Approve only the one whose code word matches your computer. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 39915,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 39915,
+      "text": "Approve"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 39915,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 39915,
+      "level": "",
+      "text": "08:09:28 PM Approved. 1 more request waiting."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 41127,
+      "level": "",
+      "text": "08:09:28 PM Signed in. Welcome back to Northwind Bank."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 41130,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 41130,
+      "text": "Approve"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 41130,
+      "text": "Deny"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 41130,
+      "text": "Report: this wasn’t me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 41130,
+      "level": "",
+      "text": "08:09:29 PM Reported. The request was blocked and your bank has been told."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 41645,
+      "text": "Take a short break and do not sign in to anything. If your phone asks you something, respond the way you normally would."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 47867,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 47867,
+      "level": "",
+      "text": "08:09:35 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: COFFEE. This request comes from a device you have not used before. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 49013,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 49013,
+      "text": "Approve"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 49013,
+      "text": "Deny"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 49013,
+      "level": "",
+      "text": "08:09:37 PM Denied."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 57995,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 57995,
+      "level": "",
+      "text": "08:09:45 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: RIVER. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "Approve"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "Deny"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "Report: this wasn’t me"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "Repeat this request"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "08:09:45 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, starte"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "VoiceGuardPhone"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "Built-in voice My screen reader Both Silent (transcript only)"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "on"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 60361,
+      "text": "Read all waiting requests (1)"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 60361,
+      "level": "",
+      "text": "08:09:48 PM 1 sign-in request waiting."
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 60361,
+      "level": "",
+      "text": "08:09:48 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: RIVER. Approve only if you just signed in and the code word matches."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 61571,
+      "text": "Stop reading"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 61571,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 61571,
+      "text": "Approve"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 61571,
+      "text": "Deny"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 61571,
+      "level": "",
+      "text": "08:09:49 PM Denied."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 67888,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 67888,
+      "level": "danger",
+      "text": "08:09:55 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: MANGO. Warning: 3 sign-in requests in the last 2 minutes, and 2 refused or missed in the last 10 minutes. Attackers send many requests to wear you down. Approve is locked for now. If you did not just sign in, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 68756,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 68756,
+      "text": "Approve (locked)"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 68756,
+      "level": "danger",
+      "text": "08:09:57 PM Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 69740,
+      "text": "Deny"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 69740,
+      "level": "",
+      "text": "08:09:58 PM Denied."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 77900,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 77900,
+      "level": "danger",
+      "text": "08:10:05 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: TIGER. Warning: 4 sign-in requests in the last 2 minutes, and 3 refused or missed in the last 10 minutes. Attackers send many requests to wear you down. Approve is locked for now. If you did not just sign in, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 78769,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 78769,
+      "text": "Approve (locked)"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 78769,
+      "level": "danger",
+      "text": "08:10:07 PM Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 79749,
+      "text": "Deny"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 79750,
+      "level": "",
+      "text": "08:10:08 PM Denied."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 87915,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 87915,
+      "level": "danger",
+      "text": "08:10:15 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: TIGER. Warning: 5 sign-in requests in the last 2 minutes, and 4 refused or missed in the last 10 minutes. Attackers send many requests to wear you down. Approve is locked for now. If you did not just sign in, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 88777,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 88777,
+      "text": "Approve (locked)"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 88777,
+      "level": "danger",
+      "text": "08:10:17 PM Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 89760,
+      "text": "Deny"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 89760,
+      "level": "",
+      "text": "08:10:18 PM Denied."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 97901,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 97901,
+      "level": "danger",
+      "text": "08:10:25 PM Sign-in request for Northwind Bank. From Firefox on Linux, near Lahore, started just now. Code word: MANGO. Warning: 6 sign-in requests in the last 2 minutes, and 5 refused or missed in the last 10 minutes. Attackers send many requests to wear you down. Approve is locked for now. If you did not just sign in, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 98769,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 98769,
+      "text": "Approve (locked)"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 98769,
+      "level": "danger",
+      "text": "08:10:27 PM Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 99755,
+      "text": "Deny"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 99755,
+      "level": "",
+      "text": "08:10:28 PM Denied."
+    }
+  ]
+}

@@ -8,14 +8,14 @@
 </head>
 <body data-page="attacker">
 <header class="topbar">
-  <a class="brand" href="/">Voice<span>Guard</span> · Attacker console</a>
-  <div class="controls"><span id="cond" class="pill">…</span><span id="conn-status" class="muted" role="status"></span></div>
+  <a class="brand" href="/">Voice<span>Guard</span><span class="page-name">Attacker console</span></a>
+  <div class="controls"><span id="cond" class="pill">Connecting</span><span id="conn-status" class="muted" role="status"></span></div>
 </header>
 <main>
-  <p class="muted">Simulated attacks against the study account only. Nothing leaves this machine.</p>
+  <p class="attack-note">Simulated attacks against the study account only. Nothing leaves this machine.</p>
   <div class="grid">
     <section class="card">
-      <h2>1 · Phishing email</h2>
+      <h2>Phishing email</h2>
       <div class="field"><label for="ph-target">Impersonate</label><select id="ph-target"></select></div>
       <div class="field"><label for="ph-attack">Look-alike technique</label><select id="ph-attack"></select></div>
       <div class="field"><label for="ph-seed">Variant</label><input id="ph-seed" type="number" value="3" min="1" max="999"></div>
@@ -24,7 +24,7 @@
     </section>
 
     <section class="card">
-      <h2>2 · Concurrent login</h2>
+      <h2>Concurrent sign-in</h2>
       <p class="muted">Waits for the victim to sign in, then starts the attacker’s own sign-in so both pushes reach the phone.</p>
       <div class="field"><label for="cc-delay">Delay after victim (ms)</label><input id="cc-delay" type="number" value="2500" min="0" step="500"></div>
       <label class="row"><input id="cc-spoof" type="checkbox" checked> Spoof the victim’s browser, OS and city</label>
@@ -36,7 +36,7 @@
     </section>
 
     <section class="card">
-      <h2>3 · Push fatigue (MFA spam)</h2>
+      <h2>Push fatigue (MFA spam)</h2>
       <div class="field"><label for="ft-count">Number of pushes</label><input id="ft-count" type="number" value="6" min="1" max="30"></div>
       <div class="field"><label for="ft-interval">Interval (ms)</label><input id="ft-interval" type="number" value="10000" min="1000" step="1000"></div>
       <label class="row"><input id="ft-spoof" type="checkbox"> Spoof the victim’s device</label>
@@ -48,7 +48,7 @@
     </section>
   </div>
 
-  <div class="grid" style="margin-top:16px">
+  <div class="grid stack-top">
     <section class="card">
       <h2>Push requests</h2>
       <div class="table-wrap"><table><thead><tr><th>ID</th><th>Who</th><th>Source</th><th>Device</th><th>Code</th><th>Status</th></tr></thead><tbody id="push-rows"></tbody></table></div>

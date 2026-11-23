@@ -11,14 +11,14 @@
   <div class="card">
     <h1>Participant computer</h1>
     <p>This window plays the part of your computer and its screen reader.</p>
-    <button class="primary big">Start (turns on audio)</button>
+    <button class="primary big">Start and turn on audio</button>
   </div>
 </div>
 
 <header class="topbar">
-  <a class="brand" href="/">Voice<span>Guard</span> · Computer</a>
+  <a class="brand" href="/">Voice<span>Guard</span><span class="page-name">Computer</span></a>
   <div class="controls">
-    <span id="cond" class="pill">…</span>
+    <span id="cond" class="pill">Connecting</span>
     <label for="voice-mode">Voice</label>
     <select id="voice-mode">
       <option value="tts">Built-in voice</option>
@@ -31,7 +31,7 @@
 </header>
 
 <main>
-  <div class="grid" style="grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);">
+  <div class="grid pc-layout">
     <section class="browser" aria-label="Web browser">
       <div class="browser-bar">
         <button id="btn-back" aria-label="Back">←</button>
@@ -40,7 +40,7 @@
       </div>
       <div id="viewport" class="viewport" tabindex="-1"></div>
     </section>
-    <aside class="card" aria-label="What the screen reader said">
+    <aside class="card voice-panel" aria-label="What the screen reader said">
       <h2>Spoken output</h2>
       <ol id="transcript" class="transcript"></ol>
     </aside>
@@ -109,7 +109,12 @@
     dialog.dataset.url = url;
     dialog.showModal();
     document.getElementById('int-back').focus();
-    VG.speak(`${text} Press Enter to go back to safety.`, { earcon: 'danger', level: 'danger' });
+    // The full warning was already heard when the link took focus, so do not repeat it
+    // here; the dialog still carries the full text for anyone reading the page.
+    const spoken = spokenLinks.has(url)
+      ? 'Blocked. Look-alike website. Press Enter to go back to safety.'
+      : `${text} Press Enter to go back to safety.`;
+    VG.speak(spoken, { earcon: 'danger', level: 'danger' });
     VG.log('guard_warning', { where: 'interstitial', url, attack: a.attack, target: a.target });
     VG.log('interstitial_shown', { url, attack: a.attack });
   }
@@ -160,9 +165,9 @@
       <h1>Start page</h1>
       <p class="muted">Bookmarks</p>
       <div class="bookmarks">
-        <button data-go="${MAIL}">📧 Campus Mail<br><span class="muted">mail.campusmail.edu</span></button>
-        <button data-go="https://${b.bank.domain}/login">🏦 ${esc(b.bank.name)}<br><span class="muted">${esc(b.bank.domain)}</span></button>
-        <button data-go="https://${b.pay.domain}/login">💳 ${esc(b.pay.name)}<br><span class="muted">${esc(b.pay.domain)}</span></button>
+        <button data-go="${MAIL}">Campus Mail<br><span class="muted">mail.campusmail.edu</span></button>
+        <button data-go="https://${b.bank.domain}/login">${esc(b.bank.name)}<br><span class="muted">${esc(b.bank.domain)}</span></button>
+        <button data-go="https://${b.pay.domain}/login">${esc(b.pay.name)}<br><span class="muted">${esc(b.pay.domain)}</span></button>
       </div>`;
     view.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', () => go(el.dataset.go)));
     if (announce) {
@@ -198,7 +203,7 @@
   function renderMessage(m, announce) {
     if (!m.read) VG.api('/api/mail/read', { id: m.id });
     view.innerHTML = `
-      <button id="to-inbox">← Inbox</button>
+      <button id="to-inbox">Back to inbox</button>
       <article class="mail-body" style="margin-top:12px">
         <h1>${esc(m.subject)}</h1>
         <p class="muted">From: ${esc(m.from)}</p>
@@ -245,10 +250,20 @@
     const url = link.dataset.url;
     const a = analyze(url);
     if (VG.guard('domain')) {
-      VG.speak(DomainGuard.announceLink(a, link.textContent), a.verdict === 'lookalike' ? { earcon: 'danger', level: 'danger' } : {});
-      if (a.verdict === 'lookalike' && !spokenLinks.has(url)) {
-        spokenLinks.add(url);
-        VG.log('guard_warning', { where: 'link', url, attack: a.attack, target: a.target });
+      if (a.verdict === 'lookalike') {
+        // A link is re-announced every time it regains focus: closing the blocked-page
+        // dialog gives focus back to it, and the link is rebuilt when the page re-renders.
+        // Hear the full warning once, then a short reminder, so the participant is not
+        // given the same long sentence four times over.
+        if (spokenLinks.has(url)) {
+          VG.speak(DomainGuard.announceLinkShort(a), { level: 'danger' });
+        } else {
+          spokenLinks.add(url);
+          VG.speak(DomainGuard.announceLink(a, link.textContent), { earcon: 'danger', level: 'danger' });
+          VG.log('guard_warning', { where: 'link', url, attack: a.attack, target: a.target });
+        }
+      } else {
+        VG.speak(DomainGuard.announceLink(a, link.textContent), {});
       }
     } else {
       // How screen readers read a link today: link text, then the address as whole words.
@@ -324,13 +339,15 @@
         : `<p>We sent a notification to your phone. Tap Yes to sign in.</p>`}`;
       if (announcedSession !== 'pending') {
         announcedSession = 'pending';
+        // The code word is said twice on purpose — it has to be heard over noise — but
+        // it is not named a third time inside the instruction.
         VG.speak(codeOn
-          ? `Check your phone. Your code word is ${live.codeWord}. Again: ${live.codeWord}. Only approve a request that says ${live.codeWord}. This request comes from ${dev.browser} on ${dev.os}, near ${dev.location}.`
+          ? `Check your phone. Your code word is ${live.codeWord}. Again: ${live.codeWord}. Only approve a request that carries that code word. This request comes from ${dev.browser} on ${dev.os}, near ${dev.location}.`
           : 'Check your phone. We sent a notification to your phone. Tap Yes to sign in.');
       }
     } else if (live.status === 'approved') {
       view.innerHTML = `<h1>Welcome back</h1><p>You are signed in to ${esc(brand.name)}.</p>
-        <div class="card"><h2>Accounts</h2><p>Current account · Rs 52,340</p><p>October statement · ready</p></div>`;
+        <div class="card"><h2>Accounts</h2><p>Current account: Rs 52,340</p><p>October statement is ready</p></div>`;
       if (announcedSession !== 'approved') { announcedSession = 'approved'; VG.speak(`Signed in. Welcome back to ${brand.name}.`, { earcon: 'ok' }); }
     } else {
       view.innerHTML = `<h1>Sign-in not approved</h1><p>The request on your phone was ${esc(live.status)}.</p><button id="retry" class="primary">Try again</button>`;

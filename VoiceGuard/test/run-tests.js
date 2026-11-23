@@ -111,6 +111,56 @@ test('adaptive expiry grows when speech is slower', () => {
   assert.ok(fast.expiresMs >= PG.DEFAULTS.baseExpiryMs);
 });
 
+// ---------- regressions ----------
+test('brand-in-subdomain names the trusted brand as the real address, not the attacker host', () => {
+  const a = verdict('paypal.com.secure-login.net');
+  assert.strictEqual(a.attack, 'brand-in-subdomain');
+  const s = DG.announceLink(a);
+  // The sentence before it says where the link goes; the sentence after it must not
+  // contradict that by calling the attacker's host "the real address".
+  assert.match(s, /It goes to secure dash login dot net, not paypal dot com/);
+  assert.match(s, /The name paypal is only put at the front/);
+  assert.doesNotMatch(s, /The real address is secure dash login dot net/);
+  assert.doesNotMatch(DG.announcePage(a), /The real address is secure dash login dot net/);
+});
+
+test('no announcement ever calls the attacker host "the real address"', () => {
+  for (const real of TRUSTED) {
+    for (const attack of DG.ATTACK_TYPES) {
+      const fake = DG.makeLookalike(real, attack, 3);
+      if (!fake) continue;
+      const a = DG.analyze(fake, TRUSTED);
+      if (a.verdict !== 'lookalike') continue;
+      for (const text of [DG.announceLink(a), DG.announcePage(a)]) {
+        const m = text.match(/The real address is ([^.]+)\./);
+        if (!m) continue;
+        assert.notStrictEqual(m[1].trim(), DG.readAsScreenReader(a.registrable),
+          `"${attack} ${fake}" calls the attacker host the real address`);
+      }
+    }
+  }
+});
+
+test('the short warning keeps the host difference and drops the long description', () => {
+  const a = verdict('bankoffamerica.com');
+  const full = DG.announceLink(a);
+  const short = DG.announceLinkShort(a);
+  assert.match(short, /It goes to bankoffamerica dot com, not bankofamerica dot com/);
+  assert.doesNotMatch(short, /double F/);
+  assert.ok(short.length < full.length, 'short warning should be shorter');
+});
+
+test('the new-device warning is not repeated for a device already seen', () => {
+  const other = { browser: 'Firefox', os: 'Linux', location: 'Lahore' };
+  const p1 = push(0, { device: other, codeWord: 'ONE' });
+  const p2 = push(10000, { device: other, codeWord: 'TWO' });
+  const opts = { knownDevices: [PG.deviceKey(dev)] };
+  const first = PG.assess(p1, [p1], 0, opts);
+  const second = PG.assess(p2, [p1, p2], 10000, opts);
+  assert.ok(first.warnings.some((w) => w.type === 'new-device'), 'a genuinely new device should warn');
+  assert.ok(!second.warnings.some((w) => w.type === 'new-device'), 'the same device must not warn again');
+});
+
 let failed = 0;
 for (const t of tests) {
   try { t.fn(); console.log(`ok   ${t.name}`); } catch (e) { failed++; console.log(`FAIL ${t.name}\n     ${e.message}`); }

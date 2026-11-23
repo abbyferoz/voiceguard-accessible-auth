@@ -101,11 +101,17 @@
     }
 
     if (c.context && o.knownDevices.length && !o.knownDevices.includes(deviceKey(push.device))) {
-      warnings.push({
-        type: 'new-device',
-        level: 'warn',
-        text: `This request comes from a device you have not used before.`,
-      });
+      // "A device you have not used before" means before this request, not before
+      // this push: an attacker sending six requests from one machine must be told
+      // once, not once per request, or the announcement becomes unbearable.
+      const seenBefore = sameAccount.some((p) => p.id !== push.id && deviceKey(p.device) === deviceKey(push.device));
+      if (!seenBefore) {
+        warnings.push({
+          type: 'new-device',
+          level: 'warn',
+          text: `This request comes from a device you have not used before.`,
+        });
+      }
     }
 
     const index = pending.findIndex((p) => p.id === push.id);

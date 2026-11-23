@@ -1,0 +1,1255 @@
+{
+  "condition": "baseline",
+  "participant": "P01",
+  "base": "http://localhost:3100",
+  "startedAt": 1795446424542,
+  "summary": [
+    {
+      "task": "legit_email",
+      "condition": "baseline",
+      "outcome": "legit_success",
+      "detail": "signed_in",
+      "warningsHeard": 0,
+      "decisionMs": 2079,
+      "durationMs": 7381
+    },
+    {
+      "task": "legit_login",
+      "condition": "baseline",
+      "outcome": "legit_success",
+      "detail": "signed_in",
+      "warningsHeard": 0,
+      "decisionMs": 2072,
+      "durationMs": 5219
+    },
+    {
+      "task": "phish_typo",
+      "condition": "baseline",
+      "outcome": "attack_success",
+      "detail": "opened_link;submitted_credentials;approved_relay_push",
+      "warningsHeard": 0,
+      "decisionMs": 1803,
+      "durationMs": 8107
+    },
+    {
+      "task": "phish_subdomain",
+      "condition": "baseline",
+      "outcome": "attack_success",
+      "detail": "opened_link;submitted_credentials;approved_relay_push",
+      "warningsHeard": 0,
+      "decisionMs": 1802,
+      "durationMs": 8078
+    },
+    {
+      "task": "concurrent",
+      "condition": "baseline",
+      "outcome": "attack_success",
+      "detail": "approved_attacker",
+      "warningsHeard": 0,
+      "decisionMs": 1819,
+      "durationMs": 7416,
+      "pushesSent": 1,
+      "pushesBeforeApproval": 1
+    },
+    {
+      "task": "fatigue",
+      "condition": "baseline",
+      "outcome": "resisted",
+      "detail": "no_approval",
+      "warningsHeard": 0,
+      "decisionMs": 1463,
+      "durationMs": 58379,
+      "pushesSent": 6
+    }
+  ],
+  "actions": [
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://mail.campusmail.edu/inbox \"Campus Mailmail.campusmail.edu\"",
+      "t": 7837
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open Campus Mail bookmark",
+      "t": 7837
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON m6 \"statements@northwindbank.comUnread. Your Northwind Bank statement is ready\"",
+      "t": 8591
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the message",
+      "t": 8591
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "A https://northwindbank.com/statements \"View your statement\"",
+      "t": 9387
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — follow the statement link",
+      "t": 9789
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 10713
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 10713
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 10822
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 10822
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Yes\"",
+      "t": 12901
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the sign-in request",
+      "t": 12901
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://contosopay.com/login \"Contoso Paycontosopay.com\"",
+      "t": 15570
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the payment app bookmark",
+      "t": 15570
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 16481
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 16481
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 16573
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 16573
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Yes\"",
+      "t": 18643
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the sign-in request",
+      "t": 18643
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://mail.campusmail.edu/inbox \"Campus Mailmail.campusmail.edu\"",
+      "t": 21157
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open Campus Mail bookmark",
+      "t": 21157
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON m17 \"security@northwiindbank.comUnread. Northwind Bank: unusual sign-in detected\"",
+      "t": 21868
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the message",
+      "t": 21868
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "A https://northwiindbank.com/verify \"Confirm your identity\"",
+      "t": 22656
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — follow the link (no warning heard)",
+      "t": 23672
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 24590
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 24590
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 24680
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 24680
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Yes\"",
+      "t": 27365
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the request (thought it was the sign-in just made)",
+      "t": 27365
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://mail.campusmail.edu/inbox \"Campus Mailmail.campusmail.edu\"",
+      "t": 29776
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open Campus Mail bookmark",
+      "t": 29776
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON m23 \"refunds@auth-check.siteUnread. Contoso Pay: you have a refund of Rs 4,500\"",
+      "t": 30484
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the message",
+      "t": 30484
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "A https://contosopay.com.auth-check.site/refund \"Claim your refund\"",
+      "t": 31277
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — follow the link (no warning heard)",
+      "t": 32289
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 33199
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 33199
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 33293
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 33293
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Yes\"",
+      "t": 35963
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the request (thought it was the sign-in just made)",
+      "t": 35963
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON https://northwindbank.com/login \"Northwind Banknorthwindbank.com\"",
+      "t": 38448
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — open the bank bookmark",
+      "t": 38448
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "INPUT  \"\"",
+      "t": 39365
+    },
+    {
+      "device": "PC",
+      "action": "type",
+      "detail": "password into the password field",
+      "t": 39365
+    },
+    {
+      "device": "PC",
+      "action": "focus-reached",
+      "detail": "BUTTON  \"Sign in\"",
+      "t": 39459
+    },
+    {
+      "device": "PC",
+      "action": "key",
+      "detail": "Enter — submit the sign-in form",
+      "t": 39459
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON approve \"Yes\"",
+      "t": 43780
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — approve the request that is on screen",
+      "t": 43780
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"No, it’s not me\"",
+      "t": 51768
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 51768
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"No, it’s not me\"",
+      "t": 61897
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 61897
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"No, it’s not me\"",
+      "t": 71824
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 71824
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"No, it’s not me\"",
+      "t": 81957
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 81957
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"No, it’s not me\"",
+      "t": 91858
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 91858
+    },
+    {
+      "device": "PHONE",
+      "action": "focus-reached",
+      "detail": "BUTTON deny \"No, it’s not me\"",
+      "t": 101769
+    },
+    {
+      "device": "PHONE",
+      "action": "key",
+      "detail": "Enter — deny the request (never signed in)",
+      "t": 101769
+    }
+  ],
+  "rec": [
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 5943,
+      "text": "Start and turn on audio"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 5943,
+      "level": "",
+      "text": "08:07:09 PM Computer ready. You are on the start page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 5946,
+      "text": "Start and turn on audio"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 5946,
+      "level": "",
+      "text": "08:07:10 PM Phone ready."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 6526,
+      "text": "You have a new email from your bank about your monthly statement. Open it and sign in to see the statement."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "VoiceGuardComputer"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Built-in voice My screen reader Both Silent (transcript only)"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Back"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Start page"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "statements@northwindbank.comUnread. Your Northwind Bank statement is ready"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 12744,
+      "level": "",
+      "text": "08:07:12 PM Inbox. 3 messages, 1 unread."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 12744,
+      "level": "",
+      "text": "08:07:13 PM Message from statements. Subject: Your Northwind Bank statement is ready. Your monthly statement for October is ready. Sign in to Northwind Bank to view it."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 12744,
+      "level": "",
+      "text": "08:07:13 PM Link. View your statement. northwindbank dot com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "View your statement"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 12744,
+      "level": "",
+      "text": "08:07:14 PM Northwind Bank. Sign in. Heading level 1."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 12744,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 12744,
+      "level": "",
+      "text": "08:07:15 PM Check your phone. We sent a notification to your phone. Tap Yes to sign in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 12746,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 12746,
+      "level": "",
+      "text": "08:07:15 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 14418,
+      "level": "",
+      "text": "08:07:17 PM Signed in. Welcome back to Northwind Bank."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 14422,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 14422,
+      "text": "Yes"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 14422,
+      "level": "",
+      "text": "08:07:17 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 14429,
+      "text": "Sign in to your payment app using the bookmark on the start page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 18488,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 18488,
+      "text": "Northwind Banknorthwindbank.com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 18488,
+      "text": "Contoso Paycontosopay.com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 18488,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 18488,
+      "level": "",
+      "text": "08:07:20 PM Contoso Pay. Sign in. Heading level 1."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 18488,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 18488,
+      "level": "",
+      "text": "08:07:21 PM Check your phone. We sent a notification to your phone. Tap Yes to sign in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 18490,
+      "text": "Contoso Pay"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 18490,
+      "level": "",
+      "text": "08:07:21 PM Contoso Pay. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 20156,
+      "level": "",
+      "text": "08:07:23 PM Signed in. Welcome back to Contoso Pay."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 20158,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 20158,
+      "text": "Yes"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 20158,
+      "level": "",
+      "text": "08:07:23 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 20164,
+      "text": "Your bank has emailed you about a security check on your account. Deal with it the way you normally would."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 23668,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 23668,
+      "text": "security@northwiindbank.comUnread. Northwind Bank: unusual sign-in detected"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 23668,
+      "level": "",
+      "text": "08:07:25 PM Inbox. 3 messages, 1 unread."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 23668,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 23668,
+      "level": "",
+      "text": "08:07:26 PM Message from security. Subject: Northwind Bank: unusual sign-in detected. We noticed an unusual sign-in to your Northwind Bank account. Please confirm your identity within 24 hours to avoid suspension."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 23668,
+      "level": "",
+      "text": "08:07:27 PM Link. Confirm your identity. northwiindbank dot com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 23668,
+      "text": "Confirm your identity"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 27209,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 27209,
+      "level": "",
+      "text": "08:07:28 PM Northwind Bank. Sign in. Heading level 1."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 27209,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 27209,
+      "level": "",
+      "text": "08:07:29 PM Check your phone. Approve the request on your phone to finish signing in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 27211,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 27211,
+      "level": "",
+      "text": "08:07:30 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 28785,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 28785,
+      "text": "Yes"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 28785,
+      "level": "",
+      "text": "08:07:31 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 28789,
+      "text": "Your payment app has emailed you about a refund. Deal with it the way you normally would."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 32285,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 32285,
+      "text": "refunds@auth-check.siteUnread. Contoso Pay: you have a refund of Rs 4,500"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 32285,
+      "level": "",
+      "text": "08:07:34 PM Inbox. 3 messages, 1 unread."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 32285,
+      "text": "Back to inbox"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 32285,
+      "level": "",
+      "text": "08:07:35 PM Message from refunds. Subject: Contoso Pay: you have a refund of Rs 4,500. A refund of Rs 4,500 is waiting for you. Sign in to Contoso Pay to claim it before it expires."
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 32285,
+      "level": "",
+      "text": "08:07:35 PM Link. Claim your refund. contosopay dot com dot auth dash check dot site"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 32285,
+      "text": "Claim your refund"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 35812,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 35812,
+      "level": "",
+      "text": "08:07:36 PM Contoso Pay. Sign in. Heading level 1."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 35812,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 35812,
+      "level": "",
+      "text": "08:07:37 PM Check your phone. Approve the request on your phone to finish signing in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 35813,
+      "text": "Contoso Pay"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 35813,
+      "level": "",
+      "text": "08:07:39 PM Contoso Pay. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 37373,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 37373,
+      "text": "Yes"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 37373,
+      "level": "",
+      "text": "08:07:40 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 37378,
+      "text": "Sign in to your bank using the bookmark on the start page."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 43616,
+      "text": "Campus Mailmail.campusmail.edu"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 43616,
+      "text": "Northwind Banknorthwindbank.com"
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 43616,
+      "text": "Password"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 43616,
+      "level": "",
+      "text": "08:07:42 PM Northwind Bank. Sign in. Heading level 1."
+    },
+    {
+      "kind": "focus",
+      "dev": "PC",
+      "t": 43616,
+      "text": "Sign in"
+    },
+    {
+      "kind": "say",
+      "dev": "PC",
+      "t": 43616,
+      "level": "",
+      "text": "08:07:44 PM Check your phone. We sent a notification to your phone. Tap Yes to sign in."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 43620,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 43620,
+      "level": "",
+      "text": "08:07:44 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 43620,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 43620,
+      "level": "",
+      "text": "08:07:46 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 44792,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 44792,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 44792,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 44792,
+      "level": "",
+      "text": "08:07:48 PM Approved."
+    },
+    {
+      "kind": "instruction",
+      "dev": "EXPERIMENTER",
+      "t": 45304,
+      "text": "Take a short break and do not sign in to anything. If your phone asks you something, respond the way you normally would."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 51522,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 51522,
+      "level": "",
+      "text": "08:07:54 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 52678,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 52678,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 52678,
+      "text": "No, it’s not me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 52678,
+      "level": "",
+      "text": "08:07:56 PM Denied. Secure your account. Change password."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 61659,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 61659,
+      "level": "",
+      "text": "08:08:04 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 62805,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 62805,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 62805,
+      "text": "No, it’s not me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 62805,
+      "level": "",
+      "text": "08:08:06 PM Denied. Secure your account. Change password."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 71585,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 71586,
+      "level": "",
+      "text": "08:08:14 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 72731,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 72731,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 72731,
+      "text": "No, it’s not me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 72731,
+      "level": "",
+      "text": "08:08:16 PM Denied. Secure your account. Change password."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 81720,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 81720,
+      "level": "",
+      "text": "08:08:24 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 82865,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 82865,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 82865,
+      "text": "No, it’s not me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 82865,
+      "level": "",
+      "text": "08:08:26 PM Denied. Secure your account. Change password."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 91633,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 91633,
+      "level": "",
+      "text": "08:08:34 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 92764,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 92764,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 92764,
+      "text": "No, it’s not me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 92764,
+      "level": "",
+      "text": "08:08:36 PM Denied. Secure your account. Change password."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 101532,
+      "text": "Northwind Bank"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 101532,
+      "level": "",
+      "text": "08:08:44 PM Northwind Bank. Are you trying to sign in? Approve. Deny."
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 102677,
+      "text": "🎤 Answer by voice"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 102677,
+      "text": "Yes"
+    },
+    {
+      "kind": "focus",
+      "dev": "PHONE",
+      "t": 102677,
+      "text": "No, it’s not me"
+    },
+    {
+      "kind": "say",
+      "dev": "PHONE",
+      "t": 102677,
+      "level": "",
+      "text": "08:08:46 PM Denied. Secure your account. Change password."
+    }
+  ]
+}
