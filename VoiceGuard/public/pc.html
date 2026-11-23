@@ -11,14 +11,14 @@
   <div class="card">
     <h1>Participant computer</h1>
     <p>This window plays the part of your computer and its screen reader.</p>
-    <button class="primary big">Start (turns on audio)</button>
+    <button class="primary big">Start and turn on audio</button>
   </div>
 </div>
 
 <header class="topbar">
-  <a class="brand" href="/">Voice<span>Guard</span> · Computer</a>
+  <a class="brand" href="/">Voice<span>Guard</span><span class="page-name">Computer</span></a>
   <div class="controls">
-    <span id="cond" class="pill">…</span>
+    <span id="cond" class="pill">Connecting</span>
     <label for="voice-mode">Voice</label>
     <select id="voice-mode">
       <option value="tts">Built-in voice</option>
@@ -31,7 +31,7 @@
 </header>
 
 <main>
-  <div class="grid" style="grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);">
+  <div class="grid pc-layout">
     <section class="browser" aria-label="Web browser">
       <div class="browser-bar">
         <button id="btn-back" aria-label="Back">←</button>
@@ -40,7 +40,7 @@
       </div>
       <div id="viewport" class="viewport" tabindex="-1"></div>
     </section>
-    <aside class="card" aria-label="What the screen reader said">
+    <aside class="card voice-panel" aria-label="What the screen reader said">
       <h2>Spoken output</h2>
       <ol id="transcript" class="transcript"></ol>
     </aside>
@@ -160,9 +160,9 @@
       <h1>Start page</h1>
       <p class="muted">Bookmarks</p>
       <div class="bookmarks">
-        <button data-go="${MAIL}">📧 Campus Mail<br><span class="muted">mail.campusmail.edu</span></button>
-        <button data-go="https://${b.bank.domain}/login">🏦 ${esc(b.bank.name)}<br><span class="muted">${esc(b.bank.domain)}</span></button>
-        <button data-go="https://${b.pay.domain}/login">💳 ${esc(b.pay.name)}<br><span class="muted">${esc(b.pay.domain)}</span></button>
+        <button data-go="${MAIL}">Campus Mail<br><span class="muted">mail.campusmail.edu</span></button>
+        <button data-go="https://${b.bank.domain}/login">${esc(b.bank.name)}<br><span class="muted">${esc(b.bank.domain)}</span></button>
+        <button data-go="https://${b.pay.domain}/login">${esc(b.pay.name)}<br><span class="muted">${esc(b.pay.domain)}</span></button>
       </div>`;
     view.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', () => go(el.dataset.go)));
     if (announce) {
@@ -198,7 +198,7 @@
   function renderMessage(m, announce) {
     if (!m.read) VG.api('/api/mail/read', { id: m.id });
     view.innerHTML = `
-      <button id="to-inbox">← Inbox</button>
+      <button id="to-inbox">Back to inbox</button>
       <article class="mail-body" style="margin-top:12px">
         <h1>${esc(m.subject)}</h1>
         <p class="muted">From: ${esc(m.from)}</p>
@@ -330,7 +330,7 @@
       }
     } else if (live.status === 'approved') {
       view.innerHTML = `<h1>Welcome back</h1><p>You are signed in to ${esc(brand.name)}.</p>
-        <div class="card"><h2>Accounts</h2><p>Current account · Rs 52,340</p><p>October statement · ready</p></div>`;
+        <div class="card"><h2>Accounts</h2><p>Current account: Rs 52,340</p><p>October statement is ready</p></div>`;
       if (announcedSession !== 'approved') { announcedSession = 'approved'; VG.speak(`Signed in. Welcome back to ${brand.name}.`, { earcon: 'ok' }); }
     } else {
       view.innerHTML = `<h1>Sign-in not approved</h1><p>The request on your phone was ${esc(live.status)}.</p><button id="retry" class="primary">Try again</button>`;

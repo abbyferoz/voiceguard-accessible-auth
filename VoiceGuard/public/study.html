@@ -8,9 +8,9 @@
 </head>
 <body data-page="study">
 <header class="topbar">
-  <a class="brand" href="/">Voice<span>Guard</span> · Experimenter</a>
+  <a class="brand" href="/">Voice<span>Guard</span><span class="page-name">Experimenter</span></a>
   <div class="controls">
-    <span id="cond" class="pill">…</span>
+    <span id="cond" class="pill">Connecting</span>
     <a class="btn" href="/results.html">Results</a>
     <span id="conn-status" class="muted" role="status"></span>
   </div>
@@ -18,7 +18,7 @@
 <main>
   <div class="grid">
     <section class="card">
-      <h2>1 · Participant and block</h2>
+      <h2 class="step-head"><span class="step-num" aria-hidden="true">1</span>Participant and block</h2>
       <div class="row">
         <div class="field"><label for="pid">Participant ID</label><input id="pid" value="P01" size="8"></div>
         <div class="field"><label for="block">Block</label><select id="block"><option value="1">Block 1</option><option value="2">Block 2</option></select></div>
@@ -31,19 +31,19 @@
           <select id="condition"><option value="baseline">Baseline</option><option value="guard">VoiceGuard</option></select></div>
         <div class="field"><label for="rate">Speech rate</label>
           <select id="rate"><option value="1">1.0 (default)</option><option value="1.25">1.25</option><option value="1.5">1.5</option><option value="1.75">1.75</option><option value="2">2.0</option></select></div>
-        <fieldset id="components" style="border:1px solid var(--line);border-radius:8px"><legend>VoiceGuard components</legend></fieldset>
+        <fieldset id="components"><legend>VoiceGuard components</legend></fieldset>
         <button id="apply-adv" style="margin-top:8px">Apply</button>
       </details>
     </section>
 
     <section class="card">
-      <h2>2 · Current task</h2>
+      <h2 class="step-head"><span class="step-num" aria-hidden="true">2</span>Current task</h2>
       <div id="current"><p class="muted">No task running.</p></div>
     </section>
   </div>
 
-  <section class="card" style="margin-top:16px">
-    <h2>3 · Tasks for this block</h2>
+  <section class="card stack-top">
+    <h2 class="step-head"><span class="step-num" aria-hidden="true">3</span>Tasks for this block</h2>
     <p class="muted">Order is randomised per participant and block. Read each instruction to the participant, then press Start.</p>
     <div class="table-wrap"><table>
       <thead><tr><th>#</th><th>Task</th><th>Instruction</th><th>Outcome</th><th></th></tr></thead>
@@ -57,11 +57,11 @@
     </div>
   </section>
 
-  <section class="card" style="margin-top:16px">
-    <h2>4 · After the block: questionnaires</h2>
+  <section class="card stack-top">
+    <h2 class="step-head"><span class="step-num" aria-hidden="true">4</span>After the block: questionnaires</h2>
     <form id="q">
       <h3>System Usability Scale (1 = strongly disagree, 5 = strongly agree)</h3>
-      <div id="sus"></div>
+      <div class="likert-head" aria-hidden="true"><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><div id="sus"></div>
       <h3 style="margin-top:14px">NASA-TLX (0 = very low, 100 = very high)</h3>
       <div id="tlx" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px"></div>
       <div class="field" style="margin-top:10px"><label for="trust">“I could tell which requests and links were safe” (1–7)</label>
@@ -141,7 +141,7 @@
     $('task-rows').innerHTML = list.map((t, i) => {
       const r = results.filter((x) => x.participant === pid && x.block === block && x.task === t.id).pop();
       const running = s.task && s.task.id === t.id;
-      return `<tr><td>${i + 1}</td><td><strong>${t.id}</strong><br><span class="muted">${t.kind}${t.attack ? ' · ' + t.attack : ''}</span></td>
+      return `<tr><td>${i + 1}</td><td><strong>${t.id}</strong><br><span class="muted">${t.kind}${t.attack ? ', ' + t.attack : ''}</span></td>
         <td>${esc(t.instruction)}</td>
         <td>${r ? `<strong>${r.outcome}</strong><br><span class="muted">${esc(r.detail)}</span>` : '—'}</td>
         <td>${running ? '<span class="pill guard">running</span>' : `<button data-start="${t.id}">${r ? 'Redo' : 'Start'}</button>`}</td></tr>`;
@@ -155,7 +155,7 @@
     if (!s.task) { $('current').innerHTML = '<p class="muted">No task running.</p>'; return; }
     const t = s.task;
     $('current').innerHTML = `
-      <p><strong>${t.id}</strong> · ${s.config.participant} · ${s.config.condition} · set ${t.set}</p>
+      <p><strong>${t.id}</strong> <span class="muted">for ${s.config.participant}, ${s.config.condition}, brand set ${t.set}</span></p>
       <p class="banner ok">${esc(t.instruction)}</p>
       <p>Elapsed: <strong id="elapsed">0</strong> s <span class="muted">(suggested limit ${LIMIT_S[t.id]} s)</span></p>
       <div class="field"><label for="notes">Observer notes</label><textarea id="notes" rows="2"></textarea></div>
@@ -174,7 +174,7 @@
   let lastTaskRun = undefined;
   let filled = false;
   VG.on('state', (s) => {
-    $('cond').textContent = `${s.config.participant} · block ${s.config.block} · ${s.config.condition === 'guard' ? 'VoiceGuard' : 'Baseline'}`;
+    $('cond').textContent = `${s.config.participant}, block ${s.config.block}: ${s.config.condition === 'guard' ? 'VoiceGuard' : 'Baseline'}`;
     $('cond').className = 'pill ' + s.config.condition;
     if (!filled) {
       filled = true;

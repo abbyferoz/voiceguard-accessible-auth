@@ -9,41 +9,106 @@
 <body data-page="index">
 <header class="topbar">
   <span class="brand">Voice<span>Guard</span></span>
-  <div class="controls"><span id="cond" class="pill">…</span><span id="conn-status" class="muted" role="status"></span></div>
+  <div class="controls"><span id="cond" class="pill">Connecting</span><span id="conn-status" class="muted" role="status"></span></div>
 </header>
 <main>
-  <h1>Screen-reader-aware protection for sign-in</h1>
-  <p class="muted" style="max-width:760px">VoiceGuard builds the fixes that <em>Broken Access</em> (WWW ’25) recommended and tests them.
-    It tells screen-reader users exactly how a look-alike link differs from the real site, never lets one push hide another,
-    speaks a code word that ties each push to its sign-in, and spots push-spam.</p>
+  <section class="hero" aria-labelledby="hero-title">
+    <div>
+      <h1 id="hero-title">Hear the difference before you sign in.</h1>
+      <p class="lede">To a screen reader, a fake bank address can sound exactly like the real one.
+        VoiceGuard names the closest real site and says only what is different. It also keeps every sign-in
+        request on your phone visible and stops a flood of push requests from wearing you down.</p>
+      <p class="muted">A working prototype and study harness for the fixes recommended in <em>Broken Access</em> (WWW 2025).</p>
+    </div>
 
-  <div class="grid" style="margin-top:16px">
-    <a class="card" href="/pc.html" style="text-decoration:none;color:inherit"><h2>💻 Participant computer</h2><p>Mail, bank sign-in and the browser’s spoken output.</p></a>
-    <a class="card" href="/phone.html" style="text-decoration:none;color:inherit"><h2>📱 Participant phone</h2><p>Push approvals. Open it on a real phone to use VoiceOver or TalkBack.</p></a>
-    <a class="card" href="/attacker.html" style="text-decoration:none;color:inherit"><h2>🕶️ Attacker console</h2><p>Send look-alike emails, race a concurrent login, spam pushes.</p></a>
-    <a class="card" href="/study.html" style="text-decoration:none;color:inherit"><h2>🧪 Experimenter</h2><p>Participants, counterbalanced blocks, scripted tasks, questionnaires.</p></a>
-    <a class="card" href="/results.html" style="text-decoration:none;color:inherit"><h2>📊 Results</h2><p>Automated evaluation and study outcomes, baseline against VoiceGuard.</p></a>
+    <div class="listen" aria-label="Example: a look-alike address">
+      <dl class="listen-domains">
+        <div class="listen-domain"><dt>Real site</dt><dd id="real-domain">northwindbank.com</dd></div>
+        <div class="listen-domain"><dt>Look-alike</dt><dd id="fake-domain">northwinndbank.com</dd></div>
+      </dl>
+      <div class="listen-say">
+        <h2>A screen reader today says</h2>
+        <q id="say-today">northwinndbank dot com</q>
+        <p class="same">Read at normal speed, the two addresses sound the same.</p>
+        <button id="play-today">Play today’s reading</button>
+      </div>
+      <div class="listen-say voice">
+        <h2>VoiceGuard says</h2>
+        <q id="say-guard">Warning! Look-alike link. It goes to northwinndbank dot com, not northwindbank dot com. It has a double N, as in November, after H, W, I. This is likely a phishing site.</q>
+        <button id="play-guard">Play VoiceGuard</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="roles">
+    <section aria-labelledby="h-participant">
+      <h2 id="h-participant">For the participant</h2>
+      <ul class="role-list">
+        <li><a href="/pc.html"><strong>Computer</strong><span>Mail, bank sign-in and the browser’s spoken output.</span><span class="path">/pc</span></a></li>
+        <li><a href="/phone.html"><strong>Phone</strong><span>Push approvals. Open it on a real phone to use VoiceOver or TalkBack.</span><span class="path">/phone</span></a></li>
+      </ul>
+    </section>
+    <section aria-labelledby="h-team">
+      <h2 id="h-team">For the study team</h2>
+      <ul class="role-list">
+        <li><a href="/attacker.html" data-role="attacker"><strong>Attacker console</strong><span>Send look-alike emails, race a concurrent sign-in, spam pushes.</span><span class="path">/attacker</span></a></li>
+        <li><a href="/study.html"><strong>Experimenter</strong><span>Participants, counterbalanced blocks, scripted tasks and questionnaires.</span><span class="path">/study</span></a></li>
+        <li><a href="/results.html"><strong>Results</strong><span>Automated evaluation and study outcomes, baseline against VoiceGuard.</span><span class="path">/results</span></a></li>
+      </ul>
+    </section>
   </div>
 
-  <section class="card" style="margin-top:16px">
-    <h2>Quick demo (5 minutes)</h2>
+  <section class="demo" aria-labelledby="h-demo">
+    <h2 id="h-demo">Run the five-minute demo</h2>
     <ol>
-      <li>Open <strong>Computer</strong> and <strong>Phone</strong> side by side and press Start on each.</li>
-      <li>In <strong>Experimenter</strong>, open “Advanced” and set the condition to <em>Baseline</em>.</li>
-      <li>Phishing: in <strong>Attacker</strong>, send a <em>repetition</em> email, then tab to the link on the computer. Both domains sound the same.</li>
-      <li>Concurrent login: arm the attack, then sign in to the bank from the computer. Only the attacker’s push is left on the phone.</li>
-      <li>Fatigue: start spamming and keep pressing Deny.</li>
-      <li>Switch the condition to <em>VoiceGuard</em> and repeat: you get the phonetic difference, a blocking page, both pushes with code words, and a locked Approve.</li>
+      <li><span>Open <strong>Computer</strong> and <strong>Phone</strong> side by side and press Start on each.</span></li>
+      <li><span>In <strong>Experimenter</strong>, open “Advanced” and set the condition to <em>Baseline</em>.</span></li>
+      <li><span>Phishing: in <strong>Attacker console</strong>, send a <em>repetition</em> email, then tab to the link on the computer. Both addresses sound the same.</span></li>
+      <li><span>Concurrent sign-in: arm the attack, then sign in to the bank from the computer. Only the attacker’s push is left on the phone.</span></li>
+      <li><span>Fatigue: start spamming and keep pressing Deny.</span></li>
+      <li><span>Switch the condition to <em>VoiceGuard</em> and repeat. You hear the difference spelled out, the look-alike site is blocked, both pushes show with code words, and Approve locks.</span></li>
     </ol>
   </section>
 </main>
+<script src="/js/domain-guard.js"></script>
 <script src="/js/common.js"></script>
 <script>
-VG.on('state', (s) => {
-  const c = document.getElementById('cond');
-  c.textContent = s.config.condition === 'guard' ? 'VoiceGuard on' : 'Baseline';
-  c.className = 'pill ' + s.config.condition;
-});
+(() => {
+  const $ = (id) => document.getElementById(id);
+  let shown = false;
+
+  // Mark the letters that differ, so sighted viewers can see what the ear cannot hear.
+  function markDiff(fake, real) {
+    let i = 0;
+    while (i < fake.length && fake[i] === real[i]) i++;
+    let j = 0;
+    while (j < Math.min(fake.length, real.length) - i && fake[fake.length - 1 - j] === real[real.length - 1 - j]) j++;
+    const esc = VG.esc;
+    return `${esc(fake.slice(0, i))}<mark>${esc(fake.slice(i, fake.length - j))}</mark>${esc(fake.slice(fake.length - j))}`;
+  }
+
+  function showExample(s) {
+    const real = s.brands.bank.domain;
+    const fake = DomainGuard.makeLookalike(real, 'repetition', 1);
+    if (!fake) return;
+    const a = DomainGuard.analyze('https://' + fake, s.trusted);
+    $('real-domain').textContent = real;
+    $('fake-domain').innerHTML = markDiff(fake, real);
+    $('say-today').textContent = DomainGuard.readAsScreenReader(DomainGuard.parse(fake).host);
+    $('say-guard').textContent = DomainGuard.announceLink(a);
+    shown = true;
+  }
+
+  $('play-today').addEventListener('click', () => VG.speak($('say-today').textContent));
+  $('play-guard').addEventListener('click', () => VG.speak($('say-guard').textContent, { earcon: 'danger' }));
+
+  VG.on('state', (s) => {
+    const c = $('cond');
+    c.textContent = s.config.condition === 'guard' ? 'VoiceGuard on' : 'Baseline';
+    c.className = 'pill ' + s.config.condition;
+    if (!shown) showExample(s);
+  });
+})();
 </script>
 </body>
 </html>

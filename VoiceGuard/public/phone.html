@@ -11,14 +11,14 @@
   <div class="card">
     <h1>Participant phone</h1>
     <p>Open this page on a real phone (with VoiceOver or TalkBack) or keep it in a second window.</p>
-    <button class="primary big">Start (turns on audio)</button>
+    <button class="primary big">Start and turn on audio</button>
   </div>
 </div>
 
 <header class="topbar">
-  <a class="brand" href="/">Voice<span>Guard</span> · Phone</a>
+  <a class="brand" href="/">Voice<span>Guard</span><span class="page-name">Phone</span></a>
   <div class="controls">
-    <span id="cond" class="pill">…</span>
+    <span id="cond" class="pill">Connecting</span>
     <label for="voice-mode">Voice</label>
     <select id="voice-mode">
       <option value="tts">Built-in voice</option>
@@ -26,6 +26,7 @@
       <option value="both">Both</option>
       <option value="off">Silent (transcript only)</option>
     </select>
+    <label><input type="checkbox" id="auto-voice"> Listen automatically</label>
     <span id="conn-status" class="muted" role="status"></span>
   </div>
 </header>
@@ -34,13 +35,13 @@
   <section class="phone" aria-label="Phone">
     <div class="phone-status" aria-hidden="true"><span id="clock">--:--</span><span>5G ▮▮▮</span></div>
     <div class="phone-screen">
-      <h1 style="font-size:1.1rem">Authenticator</h1>
+      <h1>Authenticator</h1>
       <div id="toolbar" class="row"></div>
       <div id="pushes"></div>
       <div id="activity"></div>
     </div>
   </section>
-  <aside class="card" style="width:340px;max-width:100%" aria-label="What the screen reader said">
+  <aside class="card voice-panel" aria-label="What the screen reader said">
     <h2>Spoken output</h2>
     <ol id="transcript" class="transcript"></ol>
   </aside>
@@ -97,7 +98,7 @@
         <dt>Near</dt><dd>${esc(p.device ? p.device.location : 'unknown')}</dd>
         <dt>Started</dt><dd>${new Date(p.createdAt).toLocaleTimeString()}</dd>
       </dl>` : '';
-    const code = guard && c.codeWord ? `<p>Code word: <span class="code-word" style="font-size:1.3rem">${esc(p.codeWord)}</span></p>` : '';
+    const code = guard && c.codeWord ? `<p>Code word: <span class="code-word">${esc(p.codeWord)}</span></p>` : '';
     const locked = a && a.locked;
     const approveLabel = guard ? 'Approve' : 'Yes';
     const denyLabel = guard ? 'Deny' : 'No, it’s not me';
@@ -108,6 +109,8 @@
         <p>${guard && c.context ? 'Sign-in request' : 'Are you trying to sign in?'}</p>
         ${details}${code}${warnings}
         <div class="actions">
+          <button class="primary voice-btn" data-act="voice" data-key="${p.id}-voice">🎤 Answer by voice</button>
+          <p class="muted voice-hint" style="flex-basis:100%;margin:0">${esc(voiceHint())}</p>
           <button class="primary" data-act="approve" data-key="${p.id}-approve" ${locked ? 'aria-disabled="true"' : ''}>${approveLabel}${locked ? ' (locked)' : ''}</button>
           <button data-act="deny" data-key="${p.id}-deny">${denyLabel}</button>
           ${guard ? `<button class="report danger" data-act="report" data-key="${p.id}-report">Report: this wasn’t me</button>` : ''}
@@ -163,8 +166,8 @@
 
     if (isGuard()) {
       const recent = S().pushes.filter((p) => p.status !== 'pending').slice(-5).reverse();
-      activity.innerHTML = recent.length ? `<h2 style="font-size:.95rem">Recent activity</h2><ul class="muted" style="padding-left:18px;font-size:.85rem">${
-        recent.map((p) => `<li>${esc(p.service)} · ${esc(PushGuard.deviceLabel(p.device))} · ${esc(p.status)}</li>`).join('')}</ul>` : '';
+      activity.innerHTML = recent.length ? `<h2 style="font-size:1rem">Recent activity</h2><ul class="muted" style="padding-left:22px;font-size:.9rem;margin:0">${
+        recent.map((p) => `<li>${esc(p.service)}, ${esc(PushGuard.deviceLabel(p.device))}: ${esc(p.status)}</li>`).join('')}</ul>` : '';
     } else activity.innerHTML = '';
 
     const restore = (focusedKey && box.querySelector(`[data-key="${focusedKey}"]`)) ||
@@ -183,14 +186,17 @@
       fresh.forEach((p, i) => {
         const a = assess(p);
         const danger = a.level === 'danger';
+        remember(a.announcement, true);
         VG.speak(a.announcement, { interrupt: false, earcon: fresh.length === 1 ? (danger ? 'danger' : 'notify') : null, level: danger ? 'danger' : '' });
         if (a.warnings.length) VG.log('guard_warning', { where: 'push', pushId: p.id, warnings: a.warnings.map((w) => w.type), locked: a.locked });
       });
     } else {
       const list = visiblePushes();
       const p = list[list.length - 1];
-      if (p) VG.speak(PushGuard.baselineAnnouncement(p), { earcon: 'notify' });
+      if (p) { remember(PushGuard.baselineAnnouncement(p), false); VG.speak(PushGuard.baselineAnnouncement(p), { earcon: 'notify' }); }
     }
+    const newest = isGuard() ? fresh[fresh.length - 1] : visiblePushes().slice(-1)[0];
+    if (newest) scheduleAutoListen(newest.id);
     // Move focus to the request heading, never straight onto Approve: one tap
     // on a focused Approve button would approve a request the user has not heard.
     if (!box.contains(document.activeElement)) {
@@ -226,27 +232,236 @@
     if (act === 'dismiss') { changePasswordUntil = 0; return render(); }
     const id = btn.closest('[data-id]').dataset.id;
     const push = S().pushes.find((p) => p.id === id);
+    if (act === 'voice') return listen(id, btn);
     if (act === 'repeat') { VG.log('repeat_request', { pushId: id }); return VG.speak(assess(push).announcement); }
-    if (btn.getAttribute('aria-disabled') === 'true') {
+    return decidePush(id, act, '');
+  });
+
+  async function decidePush(id, act, prefix) {
+    // A button press ends any listening, so the phone's own "Approved" is not heard as an answer.
+    if (!prefix && recognizer) { try { recognizer.abort(); } catch (e) { /* already stopped */ } }
+    const push = S().pushes.find((p) => p.id === id);
+    if (!push || push.status !== 'pending') return VG.speak(prefix + 'That request is no longer waiting.');
+    if (act === 'approve' && isGuard() && assess(push).locked) {
       VG.log('locked_approve_attempt', { pushId: id });
-      return VG.speak('Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report.', { level: 'danger' });
+      return VG.speak(prefix + 'Approve is locked because of too many requests. If you are signing in yourself, wait a few minutes and try again. If not, choose Report.', { level: 'danger' });
     }
     try {
       await VG.api(`/api/push/${id}`, { decision: act });
       const left = pendingPushes().filter((p) => p.id !== id).length;
       const more = isGuard() && left ? ` ${left} more request${left === 1 ? '' : 's'} waiting.` : '';
-      if (act === 'approve') VG.speak('Approved.' + more, { earcon: 'ok' });
-      else if (act === 'report') VG.speak('Reported. The request was blocked and your bank has been told.' + more, { earcon: 'ok' });
+      if (act === 'approve') VG.speak(prefix + 'Approved.' + more, { earcon: 'ok' });
+      else if (act === 'report') VG.speak(prefix + 'Reported. The request was blocked and your bank has been told.' + more, { earcon: 'ok' });
       else {
-        VG.speak(isGuard() ? 'Denied.' + more : 'Denied. Secure your account. Change password.');
+        VG.speak(prefix + (isGuard() ? 'Denied.' + more : 'Denied. Secure your account. Change password.'));
         if (!isGuard()) changePasswordUntil = Date.now() + 15000;
       }
       const next = box.querySelector('h2');
       if (next) next.focus();
     } catch (err) {
-      VG.speak(err.message, { level: 'danger' });
+      VG.speak(prefix + err.message, { level: 'danger' });
     }
+  }
+
+  // ---------- voice answers ----------
+  // Uses the browser's speech recognition (Google's service in Chrome, Apple's in Safari).
+  // Browsers only allow it on HTTPS pages.
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognizer = null;
+
+  function voiceHint() {
+    const how = autoVoiceOn() ? 'After the beep, or after pressing Answer by voice, say' : 'Press Answer by voice, then say';
+    if (isGuard() && VG.guard('codeWord')) return `${how} “approve” and the code word, or “deny”, or “report”.`;
+    if (isGuard()) return `${how} “approve”, “deny” or “report”.`;
+    return `${how} “yes” or “no”.`;
+  }
+  const sayHint = () => voiceHint().replace(/^.*?say/, 'Please say');
+
+  // ---------- automatic listening ----------
+  let autoTimer = null;
+  let autoBlocked = false;
+  const echoRetries = {};
+  const spoken = [];
+
+  function readStore(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function autoVoiceOn() { return readStore('vg-auto-voice') !== 'off'; }
+  // When the screen reader will finish what has been announced so far (estimated at 180 words
+  // a minute times the speech rate). Queued announcements add up; an interrupting one restarts it.
+  let speechEndsAt = 0;
+  function remember(text, queued) {
+    spoken.push(text);
+    while (spoken.length > 10) spoken.shift();
+    const ms = (text.split(/\s+/).filter(Boolean).length / (180 * ((S() && S().config.speechRate) || 1))) * 60000;
+    speechEndsAt = (queued ? Math.max(speechEndsAt, Date.now()) : Date.now()) + ms;
+  }
+
+  const autoBox = document.getElementById('auto-voice');
+  autoBox.checked = autoVoiceOn();
+  autoBox.addEventListener('change', () => {
+    try { localStorage.setItem('vg-auto-voice', autoBox.checked ? 'on' : 'off'); } catch (e) { /* not stored */ }
+    autoBlocked = false;
+    VG.speak(autoBox.checked ? 'Automatic listening on.' : 'Automatic listening off. Press Answer by voice to answer.');
+    lastSignature = '';
+    render();
   });
+
+  // The phone's own speech must not be picked up as an answer, so listening starts only
+  // after the request has been read. With the built-in voice the end is known exactly;
+  // with VoiceOver or TalkBack it is estimated from the length of what was announced.
+  function scheduleAutoListen(id) {
+    if (!autoVoiceOn() || autoBlocked || !Recognition || !window.isSecureContext) return;
+    clearTimeout(autoTimer);
+    const mode = readStore('vg-voice') || 'tts';
+    const usesTts = (mode === 'tts' || mode === 'both') && 'speechSynthesis' in window;
+    const started = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - started;
+      const done = usesTts ? !(speechSynthesis.speaking || speechSynthesis.pending) && elapsed > 1200 : Date.now() >= speechEndsAt + 1500;
+      if (!done) { autoTimer = setTimeout(tick, 300); return; }
+      autoTimer = setTimeout(() => {
+        const p = S().pushes.find((x) => x.id === id);
+        if (!p || p.status !== 'pending' || recognizer) return;
+        listen(id, null, true);
+      }, 600);
+    };
+    autoTimer = setTimeout(tick, 800);
+  }
+
+  // Five or more words in a row taken from what the phone just said = the phone heard itself.
+  function isEcho(heard) {
+    const w = heard.toLowerCase().replace(/[^a-z' ]/g, ' ').split(/\s+/).filter(Boolean);
+    if (w.length < 5) return false;
+    const said = ' ' + spoken.join(' ').toLowerCase().replace(/[^a-z' ]/g, ' ').split(/\s+/).filter(Boolean).join(' ') + ' ';
+    for (let i = 0; i + 5 <= w.length; i++) if (said.includes(' ' + w.slice(i, i + 5).join(' ') + ' ')) return true;
+    return false;
+  }
+
+  // Asking for the microphone inside the Start tap means later automatic listening needs no tap.
+  document.addEventListener('vg-audio-ready', () => {
+    if (!Recognition || !window.isSecureContext || !autoVoiceOn()) return;
+    try {
+      const r = new Recognition();
+      r.onstart = () => { try { r.abort(); } catch (e) { /* stopped */ } };
+      r.onerror = (e) => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') autoBlocked = true; };
+      r.start();
+    } catch (e) { /* the first request will ask instead */ }
+  });
+
+  function intentOf(text) {
+    const t = ` ${text.toLowerCase().replace(/[’]/g, "'")} `;
+    if (/\b(report|not me|wasn'?t me|scam|fraud)\b/.test(t)) return 'report';
+    if (/\b(deny|denied|decline|reject|no|nope)\b/.test(t)) return 'deny';
+    if (/\b(approve|approved|yes|yeah|yep|accept|allow|confirm|it'?s me)\b/.test(t)) return 'approve';
+    if (/\b(repeat|again)\b/.test(t)) return 'repeat';
+    return null;
+  }
+
+  // Within one letter, so "tigers" or "lemmon" still match; short words must match exactly.
+  function near(a, b) {
+    if (a === b) return true;
+    if (b.length < 5 || Math.abs(a.length - b.length) > 1) return false;
+    let i = 0, j = 0, edits = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++edits > 1) return false;
+      if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+    }
+    return edits + (a.length - i) + (b.length - j) <= 1;
+  }
+
+  function matchCodeWord(alternatives) {
+    const hits = new Set();
+    for (const alt of alternatives) {
+      for (const w of alt.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/).filter(Boolean)) {
+        for (const p of pendingPushes()) if (p.codeWord && near(w, p.codeWord.toLowerCase())) hits.add(p.id);
+      }
+      if (hits.size) break;
+    }
+    const ids = [...hits];
+    return { push: ids.length === 1 ? S().pushes.find((p) => p.id === ids[0]) : null, ambiguous: ids.length > 1 };
+  }
+
+  function listen(cardId, btn, auto) {
+    if (!Recognition) return auto ? null : VG.speak('Voice answers do not work in this browser. Use Safari on iPhone or Chrome on Android, or use the buttons.');
+    if (!window.isSecureContext) return auto ? null : VG.speak('Voice answers need the secure address that starts with https. Please ask the researcher, or use the buttons.');
+    if (recognizer) { try { recognizer.abort(); } catch (e) { /* already stopped */ } }
+    if (!auto) { clearTimeout(autoTimer); VG.stopSpeech(); }
+    const rec = new Recognition();
+    recognizer = rec;
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+    rec.maxAlternatives = 5;
+    let handled = false;
+    const button = () => btn && btn.isConnected ? btn : box.querySelector(`[data-key="${cardId}-voice"]`);
+    const setLabel = (t) => { const b = button(); if (b) b.textContent = t; };
+    rec.onresult = (e) => {
+      handled = true;
+      handleVoice(cardId, [...e.results[0]].map((r) => r.transcript), auto);
+    };
+    rec.onerror = (e) => {
+      handled = true;
+      VG.log('voice_error', { pushId: cardId, error: e.error, auto: !!auto });
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        if (auto) { autoBlocked = true; VG.speak('Automatic listening is blocked on this phone. Press Answer by voice to answer.', { interrupt: false }); }
+        else VG.speak('The microphone is blocked for this page. Allow the microphone and try again, or use the buttons.');
+      } else if (e.error === 'no-speech') {
+        if (!auto) VG.speak('I did not hear anything. Press Answer by voice and try again.');
+      } else if (e.error !== 'aborted') VG.speak('Voice answer failed. Please use the buttons.');
+    };
+    rec.onend = () => {
+      if (recognizer === rec) recognizer = null;
+      setLabel('🎤 Answer by voice');
+      if (!handled && !auto) VG.speak('I did not hear anything. Press Answer by voice and try again.');
+    };
+    // When pressed, start() must run inside the tap itself, or Safari refuses the microphone.
+    try {
+      rec.start();
+      setLabel('Listening… speak now');
+      VG.earcon('notify');
+      VG.log('voice_listen', { pushId: cardId, auto: !!auto });
+    } catch (err) {
+      if (auto) { autoBlocked = true; VG.speak('Automatic listening is blocked on this phone. Press Answer by voice to answer.', { interrupt: false }); }
+      else VG.speak('Voice answer could not start. Please use the buttons.');
+    }
+  }
+
+  function handleVoice(cardId, alternatives, auto) {
+    const heard = (alternatives[0] || '').trim();
+    if (isEcho(heard)) {
+      VG.log('voice_command', { pushId: cardId, transcript: heard, alternatives, outcome: 'echo_ignored', auto: !!auto });
+      echoRetries[cardId] = (echoRetries[cardId] || 0) + 1;
+      if (echoRetries[cardId] <= 2) scheduleAutoListen(cardId);
+      return;
+    }
+    let intent = null;
+    for (const alt of alternatives) { intent = intentOf(alt); if (intent) break; }
+    const match = matchCodeWord(alternatives);
+    const needCode = isGuard() && VG.guard('codeWord');
+    const record = (outcome, extra) => VG.log('voice_command', { pushId: cardId, transcript: heard, alternatives, intent,
+      codeWordHeard: match.push ? match.push.codeWord : null, outcome, ...(extra || {}) });
+    const said = `I heard: ${heard}. `;
+    const card = S().pushes.find((p) => p.id === cardId);
+
+    if (!intent) { record('not_understood'); return VG.speak(said + 'I did not understand. ' + sayHint()); }
+    if (intent === 'repeat') {
+      record('repeat');
+      return VG.speak(isGuard() ? assess(card).announcement : PushGuard.baselineAnnouncement(card));
+    }
+    if (match.ambiguous) { record('ambiguous_code_word'); return VG.speak(said + 'More than one request matched. Please say it again, or use the buttons.'); }
+    let target = card;
+    if (intent === 'approve' && needCode) {
+      if (!match.push) {
+        record('missing_code_word');
+        return VG.speak(said + 'To approve, say approve and the code word your computer told you. For example: approve tiger.');
+      }
+      target = match.push;
+    } else if (isGuard() && match.push) {
+      target = match.push;
+    }
+    const act = intent === 'report' && !isGuard() ? 'deny' : intent;
+    record('acted', { targetPushId: target ? target.id : null, action: act });
+    decidePush(target ? target.id : cardId, act, said);
+  }
 
   VG.on('state', render);
   // Requests that arrived before audio was switched on are announced now.

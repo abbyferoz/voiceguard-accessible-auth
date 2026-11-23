@@ -1,0 +1,556 @@
+{
+  "generatedAt": "2026-11-23T07:27:17.217Z",
+  "scenarios": {
+    "delaysS": [
+      0,
+      1,
+      2.5,
+      5,
+      10,
+      30,
+      60
+    ],
+    "fatigueIntervalsS": [
+      5,
+      10,
+      30,
+      60,
+      90,
+      300
+    ],
+    "rates": [
+      0.75,
+      1,
+      1.25,
+      1.5,
+      2
+    ]
+  },
+  "configs": [
+    {
+      "config": "Full VoiceGuard",
+      "off": [],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 7,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 12,
+        "lockedBy3": 12
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 25.3,
+          "expiryS": 81,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 19,
+          "expiryS": 68,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 15.2,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 12.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 9.5,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": []
+    },
+    {
+      "config": "Without context",
+      "off": [
+        "context"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 12,
+        "lockedBy3": 12
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 21.3,
+          "expiryS": 73,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 16,
+          "expiryS": 62,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 12.8,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 10.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 8,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "no \"new device\" warning and no spoken device or city, so without a code word an attacker on another device sounds like the user"
+      ]
+    },
+    {
+      "config": "Without codeWord",
+      "off": [
+        "codeWord"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 7,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 0,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 12,
+        "lockedBy3": 12
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 19.6,
+          "expiryS": 69,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 14.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 11.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 9.8,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 7.3,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "with a spoofed device, the two pushes sound the same in 7 of 7 races"
+      ]
+    },
+    {
+      "config": "Without concurrency",
+      "off": [
+        "concurrency"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 7,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 7,
+          "alerted": 0,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 12,
+        "lockedBy3": 12
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 14.2,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 10.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 8.5,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 7.1,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 5.3,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "no warning about the second request in 7 of 7 spoofed races"
+      ]
+    },
+    {
+      "config": "Without fatigue",
+      "off": [
+        "fatigue"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 7,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 0,
+        "lockedBy3": 0
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 25.3,
+          "expiryS": 81,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 19,
+          "expiryS": 68,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 15.2,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 12.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 9.5,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "Approve locked by the 3rd spam push in 0 of 12 schedules (full: 12)"
+      ]
+    },
+    {
+      "config": "Without adaptiveExpiry",
+      "off": [
+        "adaptiveExpiry"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 7,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 7,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 12,
+        "lockedBy3": 12
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 25.3,
+          "expiryS": 60,
+          "hearTwice": false
+        },
+        {
+          "rate": 1,
+          "listenS": 19,
+          "expiryS": 60,
+          "hearTwice": false
+        },
+        {
+          "rate": 1.25,
+          "listenS": 15.2,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 12.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 9.5,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "expiry too short to hear the request twice plus 30 s at rate 0.75× (60 s for 25.3 s of speech), 1× (60 s for 19 s of speech)"
+      ]
+    },
+    {
+      "config": "Without codeWord and context",
+      "off": [
+        "codeWord",
+        "context"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 0,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 0,
+          "alerted": 7,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 12,
+        "lockedBy3": 12
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 15.6,
+          "expiryS": 61,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 11.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 9.3,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 7.8,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 5.8,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "with a spoofed device, the two pushes sound the same in 7 of 7 races",
+        "even with a different device, the pushes sound the same in 7 of 7 races",
+        "no \"new device\" warning and no spoken device or city, so without a code word an attacker on another device sounds like the user"
+      ]
+    },
+    {
+      "config": "All components off",
+      "off": [
+        "context",
+        "codeWord",
+        "concurrency",
+        "fatigue",
+        "adaptiveExpiry"
+      ],
+      "concurrent": {
+        "unspoofed": {
+          "distinguishable": 0,
+          "alerted": 0,
+          "newDevice": 0,
+          "races": 7
+        },
+        "spoofed": {
+          "distinguishable": 0,
+          "alerted": 0,
+          "newDevice": 0,
+          "races": 7
+        }
+      },
+      "fatigue": {
+        "schedules": 12,
+        "warnedBy3": 0,
+        "lockedBy3": 0
+      },
+      "expiry": [
+        {
+          "rate": 0.75,
+          "listenS": 4.4,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1,
+          "listenS": 3.3,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.25,
+          "listenS": 2.7,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 1.5,
+          "listenS": 2.2,
+          "expiryS": 60,
+          "hearTwice": true
+        },
+        {
+          "rate": 2,
+          "listenS": 1.7,
+          "expiryS": 60,
+          "hearTwice": true
+        }
+      ],
+      "normalUse": {
+        "falseAlarms": 0,
+        "lockedOnNormalUse": false
+      },
+      "lost": [
+        "with a spoofed device, the two pushes sound the same in 7 of 7 races",
+        "even with a different device, the pushes sound the same in 7 of 7 races",
+        "no warning about the second request in 7 of 7 spoofed races",
+        "no \"new device\" warning and no spoken device or city, so without a code word an attacker on another device sounds like the user",
+        "Approve locked by the 3rd spam push in 0 of 12 schedules (full: 12)"
+      ]
+    }
+  ],
+  "domainWarningOff": {
+    "note": "With the domain warning off, the listener hears the baseline reading of the domain.",
+    "audiblyIdentical": 0.21364452423698385,
+    "meanSimilarity": 0.6884666383717375,
+    "withWarningMeanSimilarity": 0.48226278901023945
+  }
+}
