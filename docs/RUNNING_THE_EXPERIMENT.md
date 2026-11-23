@@ -42,6 +42,14 @@ The authenticator app that receives push requests. It can run in a second window
 | Push spam | Nothing special | Warning, and **Approve is locked** for 5 minutes |
 | Time limit | Fixed 60 s | Long enough to hear the request twice plus 30 s, with a "15 seconds left" warning |
 
+> **Watch this in the Baseline condition.** The Baseline deliberately reproduces today's deployed
+> behaviour, including the flaw the paper found: after a denial, "Secure your account: Change password"
+> takes the place where the next request will appear, and the next request is announced in exactly the
+> same words. A participant who treats the second prompt as a continuation of the first can end up
+> approving the attacker's request. This is the point of the Baseline, not a bug — do not "fix" it for
+> the participant. Note what they did in the observer notes, and keep the wording identical in both
+> conditions so the comparison stays fair.
+
 ### Attacker (`/attacker.html`): you play the attacker
 For demos and free testing. In a real session the Experimenter tab triggers attacks automatically.
 

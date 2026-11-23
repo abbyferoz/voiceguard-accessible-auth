@@ -109,7 +109,12 @@
     dialog.dataset.url = url;
     dialog.showModal();
     document.getElementById('int-back').focus();
-    VG.speak(`${text} Press Enter to go back to safety.`, { earcon: 'danger', level: 'danger' });
+    // The full warning was already heard when the link took focus, so do not repeat it
+    // here; the dialog still carries the full text for anyone reading the page.
+    const spoken = spokenLinks.has(url)
+      ? 'Blocked. Look-alike website. Press Enter to go back to safety.'
+      : `${text} Press Enter to go back to safety.`;
+    VG.speak(spoken, { earcon: 'danger', level: 'danger' });
     VG.log('guard_warning', { where: 'interstitial', url, attack: a.attack, target: a.target });
     VG.log('interstitial_shown', { url, attack: a.attack });
   }
@@ -245,10 +250,20 @@
     const url = link.dataset.url;
     const a = analyze(url);
     if (VG.guard('domain')) {
-      VG.speak(DomainGuard.announceLink(a, link.textContent), a.verdict === 'lookalike' ? { earcon: 'danger', level: 'danger' } : {});
-      if (a.verdict === 'lookalike' && !spokenLinks.has(url)) {
-        spokenLinks.add(url);
-        VG.log('guard_warning', { where: 'link', url, attack: a.attack, target: a.target });
+      if (a.verdict === 'lookalike') {
+        // A link is re-announced every time it regains focus: closing the blocked-page
+        // dialog gives focus back to it, and the link is rebuilt when the page re-renders.
+        // Hear the full warning once, then a short reminder, so the participant is not
+        // given the same long sentence four times over.
+        if (spokenLinks.has(url)) {
+          VG.speak(DomainGuard.announceLinkShort(a), { level: 'danger' });
+        } else {
+          spokenLinks.add(url);
+          VG.speak(DomainGuard.announceLink(a, link.textContent), { earcon: 'danger', level: 'danger' });
+          VG.log('guard_warning', { where: 'link', url, attack: a.attack, target: a.target });
+        }
+      } else {
+        VG.speak(DomainGuard.announceLink(a, link.textContent), {});
       }
     } else {
       // How screen readers read a link today: link text, then the address as whole words.
@@ -324,8 +339,10 @@
         : `<p>We sent a notification to your phone. Tap Yes to sign in.</p>`}`;
       if (announcedSession !== 'pending') {
         announcedSession = 'pending';
+        // The code word is said twice on purpose — it has to be heard over noise — but
+        // it is not named a third time inside the instruction.
         VG.speak(codeOn
-          ? `Check your phone. Your code word is ${live.codeWord}. Again: ${live.codeWord}. Only approve a request that says ${live.codeWord}. This request comes from ${dev.browser} on ${dev.os}, near ${dev.location}.`
+          ? `Check your phone. Your code word is ${live.codeWord}. Again: ${live.codeWord}. Only approve a request that carries that code word. This request comes from ${dev.browser} on ${dev.os}, near ${dev.location}.`
           : 'Check your phone. We sent a notification to your phone. Tap Yes to sign in.');
       }
     } else if (live.status === 'approved') {

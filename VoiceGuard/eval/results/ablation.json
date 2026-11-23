@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-23T07:27:17.217Z",
+  "generatedAt": "2026-11-23T14:34:48.264Z",
   "scenarios": {
     "delaysS": [
       0,
@@ -550,7 +550,7 @@
   "domainWarningOff": {
     "note": "With the domain warning off, the listener hears the baseline reading of the domain.",
     "audiblyIdentical": 0.21364452423698385,
-    "meanSimilarity": 0.6884666383717375,
-    "withWarningMeanSimilarity": 0.48226278901023945
+    "meanSimilarity": 0.6884337629718598,
+    "withWarningMeanSimilarity": 0.490796219901972
   }
 }

@@ -31,4 +31,4 @@ interface and is not switched off here.
 ## Domain warning
 
 With the look-alike link warning off, the listener hears the baseline reading: 21.4% of the 1,114 look-alikes sound identical to the real domain,
-and mean spoken similarity is 68.8% instead of 48.2% (see phishing_results.md).
+and mean spoken similarity is 68.8% instead of 49.1% (see phishing_results.md).

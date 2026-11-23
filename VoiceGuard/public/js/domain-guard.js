@@ -312,7 +312,11 @@
       case 'tld-swap':
         return `It ends in dot ${a.toSuffix.split('.').join(' dot ')}, but the real site ends in dot ${a.fromSuffix.split('.').join(' dot ')}`;
       case 'brand-in-subdomain':
-        return `The real address is ${readAsScreenReader(a.registrable)}. The name ${a.targetLabel} is only put at the front to trick you`;
+        // The real site is already named by the "not ..." clause that comes before
+        // this, so it is not named again here. Naming it twice made the announcement
+        // read as if the fake address were the real one, and it also made the fake
+        // announcement share more words with the real one.
+        return `The name ${a.targetLabel} is only put at the front of the address to trick you`;
       case 'combosquat':
         return `It adds "${a.extra}" to the real name`;
       case 'userinfo-trick':
@@ -331,6 +335,14 @@
     }
     if (a.verdict === 'unknown') return `Link. ${text}Goes to ${readAsScreenReader(a.registrable)}, a site not on your trusted list.`;
     return `Link. ${text}`;
+  }
+
+  // A short form of the warning, for when the link is re-announced and the full
+  // wording has already been heard. Keeps the one thing that matters — which host
+  // the link really goes to — without the long difference description.
+  function announceLinkShort(a) {
+    if (a.verdict !== 'lookalike') return announceLink(a);
+    return `Warning. Look-alike link. It goes to ${readAsScreenReader(a.registrable)}, not ${readAsScreenReader(a.target)}.`;
   }
 
   function announcePage(a) {
@@ -444,7 +456,7 @@
 
   return {
     parse, analyze, skeleton, squash, editScript, punycodeDecode,
-    readAsScreenReader, spell, describeDifference, announceLink, announcePage,
+    readAsScreenReader, spell, describeDifference, announceLink, announceLinkShort, announcePage,
     makeLookalike, ATTACK_TYPES, NATO,
   };
 });

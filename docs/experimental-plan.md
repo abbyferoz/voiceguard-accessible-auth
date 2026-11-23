@@ -73,8 +73,8 @@ AWARE is a semi-automated precursor to user studies, so we first evaluated Voice
 | Paper's pair `wellsfargo` / `wellssfargo` | **100% → 59.5%** |
 | Look-alikes that sound *identical* today | 21.4% overall: 98% of repetition and 100% of Unicode homoglyph attacks |
 | Look-alikes that sound identical with VoiceGuard | 0% |
-| Mean spoken similarity, all techniques | 68.8% today → 48.2% with VoiceGuard |
-| Listening time | 4.1 s for VoiceGuard's difference sentence (10.6 s for the full warning) vs 5.0 s to spell the address. Spelling still leaves the user to compare from memory. |
+| Mean spoken similarity, all techniques | 68.8% today → 49.1% with VoiceGuard |
+| Listening time | 3.8 s for VoiceGuard's difference sentence (10.4 s for the full warning) vs 5.0 s to spell the address. Spelling still leaves the user to compare from memory. |
 
 | Technique | Detected | Similarity today | Similarity with VoiceGuard |
 |---|---|---|---|
@@ -86,7 +86,7 @@ AWARE is a semi-automated precursor to user studies, so we first evaluated Voice
 | Unicode homoglyph (`pаypal`, Cyrillic а) | 100% | 100% | 54.5% |
 | TLD swap | 100% | 77.9% | 51.3% |
 | Combosquat (`paypal-login`) | 100% | 73.1% | 55.5% |
-| Brand in subdomain | 100% | 57.8% | 37.9% |
+| Brand in subdomain | 100% | 57.8% | 44.5% |
 
 **Push-abuse checks.** We replayed attack schedules through the push guard, and all 8 checks pass:
 

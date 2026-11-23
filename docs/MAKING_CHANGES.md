@@ -50,6 +50,13 @@ If you changed `domain-guard.js` or `push-guard.js`, also refresh the evaluation
 npm run eval
 ```
 
+Any number you quote in the report or the experimental plan has to be refreshed too — the evaluation
+numbers live in `docs/final-report.md` and `docs/experimental-plan.md` as well as in
+`VoiceGuard/eval/results/`.
+
+For the wording of the spoken warnings and for what was changed and why, see
+[`FIXES.md`](FIXES.md).
+
 ## 3. Common changes
 
 ### Change brands, trusted sites, emails or tasks — `server.js` (top of the file)

@@ -1,6 +1,6 @@
 ---
 title: "VoiceGuard: Making Phishing, Concurrent-Login and Push-Fatigue Attacks Audible to Screen-Reader Users"
-subtitle: "Project Report: problems, solution, automated evaluation and an exploratory study with blind users"
+subtitle: "Project Report: problems, solution, automated evaluation, end-to-end sessions and a pilot with a blind user"
 ---
 
 **Course:** Human-Computer Interaction, IBA, Fall 2026
@@ -29,9 +29,10 @@ We built **VoiceGuard**, a screen-reader-aware security layer that implements an
 1. **The system:** VoiceGuard and a complete simulation and study environment (simulated computer and phone, attacker console, experimenter console).
 2. **An automated evaluation** using the paper's own similarity metric. VoiceGuard detected **99.6%** of 1,114 generated fake domains with **no false alarms** on 85 real sites. The paper's example pair `bankofamerica.com` / `bankoffamerica.com` sounds **100% identical** today and **60% similar** with VoiceGuard. In every simulated concurrent-login race, today's behaviour leaves only the attacker's push on the phone; VoiceGuard shows both, warns, and still tells them apart when the attacker copies the victim's device and city.
 3. **An ablation** that switches off each protection in turn. It shows that the **code word** is the only thing that separates the two pushes when the device is spoofed, and that the **fatigue lock** is the only thing that stops approval under spam.
-4. **An exploratory study with 5 blind screen-reader users**, comparing today's behaviour with VoiceGuard. [TO FILL FROM study_results.md: one sentence with the headline result, e.g. "Attacks succeeded in X of Y attempts with today's behaviour and in Z of Y with VoiceGuard."] With five participants the study is exploratory and not statistically powered.
+4. **End-to-end sessions in a real browser**, driven keyboard-only by a scripted user, once per condition. Attacks succeeded **3 of 4** times with today's behaviour and **0 of 4** with VoiceGuard, and both legitimate sign-ins still succeeded. These are engineering checks, not a user study.
+5. **A pilot session with one blind screen-reader user** (Baseline block only). The participant approved an attacker's push by voice after six spam requests, and could not complete a normal sign-in in 10 minutes. The VoiceGuard block was not reached, so the pilot shows the attacks are real for a screen-reader user but cannot show that VoiceGuard helps people.
 
-The similarity scores in contribution 2 come from a model of speech, not recordings of real screen readers. The user study was run with verbal informed consent and a debrief; no formal ethics approval was obtained (see Section 6.2).
+The similarity scores in contribution 2 come from a model of speech, not recordings of real screen readers. The pilot was run with verbal informed consent; no formal ethics approval was obtained (see Section 6.3).
 
 # 1. Background
 
@@ -126,7 +127,7 @@ Following our report's advice, we treat concurrent login and fatigue as **one pu
 | `bankoffamerica.com` | "bankoffamerica dot com" | "Warning! Look-alike link. It goes to bankoffamerica dot com, not bankofamerica dot com. It has a double F, as in Foxtrot, after N, K, O. This is likely a phishing site." |
 | `paypa1.com` | "paypa1 dot com" | "…It uses digit one in place of the letter L." |
 | `pаypal.com` (Cyrillic) | "paypal dot com" | "…It uses a foreign character that looks like A." |
-| `paypal.com.secure-login.net` | "paypal dot com dot secure dash login dot net" | "…The real address is secure dash login dot net. The name paypal is only put at the front to trick you." |
+| `paypal.com.secure-login.net` | "paypal dot com dot secure dash login dot net" | "…The name paypal is only put at the front of the address to trick you." |
 
 4. **Act on it.**
    - When a link gets focus, VoiceGuard speaks the warning and plays an alarm tone.
@@ -159,6 +160,17 @@ Following our report's advice, we treat concurrent login and fatigue as **one pu
 ## 3.6 Shared fix: adaptive expiry
 
 Each request's expiry window is set to the time needed to hear it **twice plus 30 seconds**, and never less than the usual 60 seconds. A *"15 seconds left"* warning is spoken. At the default rate, VoiceGuard's announcement takes about 19 s, which gives a 68 s window. At a slower rate (0.75×) the window grows to 81 s.
+
+## 3.7 Voice answers on the phone
+
+The phone can be answered by voice, so the user does not have to find the right button.
+
+- **Automatic listening.** After a request has been read, the phone beeps and listens. A 🎤 **Answer by voice** button stays as a fallback, and a **Listen automatically** checkbox turns it off.
+- **What to say.** With VoiceGuard on, the user approves by saying **"approve" plus the code word** ("approve falcon"); "yes" alone is refused with a prompt to say the word, so the spoken answer itself is the code-word check. "Deny" and "report" (or "it's not me") act on the request. In Baseline, "yes" and "no" work. The phone repeats what it heard: *"I heard: approve falcon. Approved."*
+- **Not hearing itself.** The announcements contain the word "approve", so the phone listens only after its own speech has ended and ignores any phrase that repeats five or more words it just said.
+- **Unique code words.** No two waiting requests share a code word, so a spoken word always points at one request.
+- **HTTPS.** Browsers only allow the microphone on HTTPS pages, so the server also serves the app over HTTPS when a certificate is present. Recognition uses the browser's built-in speech service (Google's in Chrome, Apple's in Safari).
+- Every voice answer is logged (`voice_listen`, `voice_command`, `voice_error`) for analysis.
 
 # 4. What we built
 
@@ -213,11 +225,11 @@ The experimenter page runs a user study from start to finish.
 
 ## 4.3 Testing
 
-- 13 automated unit tests cover both guards, and all pass.
+- 17 automated unit tests cover both guards, and all pass.
 - We tested every scenario in the browser in both conditions:
   - In baseline, the phishing link opened the fake bank and the attacker's relay push was approved. This was scored as attack success.
   - With VoiceGuard, the link was blocked and scored as resisted.
-  - In the concurrent race, both pushes were shown with different code words. The participant approved their own and reported the attacker's.
+  - In the concurrent race, both pushes were shown with different code words. The tester approved their own and reported the attacker's.
   - Under spam, Approve locked at the third push.
 
 # 5. Findings: automated evaluation
@@ -239,11 +251,11 @@ Like AWARE, we evaluated VoiceGuard automatically before involving participants.
 | Fakes detected, with the correct real site named | **99.6%** (1,110 of 1,114) |
 | False alarms on legitimate sites | **0%** (0 of 85) |
 | `bankofamerica` / `bankoffamerica`, how similar they sound | **100% today → 60.4% with VoiceGuard** (reproduces the paper's 100%) |
-| `wellsfargo` / `wellssfargo` | **100% → 59.5%** |
+| `wellsfargo` / `wellssfargo` | **100% → 59.4%** |
 | Fakes that sound *identical* today | 21.4% overall, including **98%** of doubled-letter and **100%** of foreign-letter fakes |
 | Fakes that sound identical with VoiceGuard | **0%** |
-| Average similarity, all tricks | 68.8% today → 48.2% with VoiceGuard |
-| Listening time | 4.1 s for VoiceGuard's difference sentence vs 5.0 s to spell the whole address |
+| Average similarity, all tricks | 68.8% today → 49.1% with VoiceGuard |
+| Listening time | 3.8 s for VoiceGuard's difference sentence vs 5.0 s to spell the whole address |
 
 | Trick | Detected | Sounds identical today | Similarity today | With VoiceGuard |
 |---|---|---|---|---|
@@ -255,7 +267,7 @@ Like AWARE, we evaluated VoiceGuard automatically before involving participants.
 | Foreign letters | 100% | 100% | 100% | 54.5% |
 | Different ending | 100% | 0% | 77.9% | 51.3% |
 | Extra words | 100% | 0% | 73.1% | 55.5% |
-| Brand in subdomain | 100% | 0% | 57.8% | 37.9% |
+| Brand in subdomain | 100% | 0% | 57.8% | 44.5% |
 
 **What this means.**
 
@@ -298,117 +310,75 @@ No configuration produced a false alarm on a normal sign-in.
 
 - **The code word is the only defence against a spoofed device.** Without it, the attacker's request sounds exactly like the user's in every race. Context (device and city) only helps when the attacker does not copy them, and it also drives the "new device" warning.
 - **Each other protection does one job that nothing else covers.** Without the concurrency alert the user is never told that two requests are waiting. Without the fatigue lock nothing stops approval under spam (0 of 12 schedules). Without adaptive expiry the window stays at 60 s, which is too short to hear the full request twice at 1.0× (19 s of speech) and 0.75× (25 s).
-- **Domain warning.** With the look-alike link warning off, the listener hears the baseline reading of the domain: 21.4% of look-alikes sound identical to the real site and mean similarity rises from 48.2% to 68.8% (Section 5.1).
+- **Domain warning.** With the look-alike link warning off, the listener hears the baseline reading of the domain: 21.4% of look-alikes sound identical to the real site and mean similarity rises from 49.1% to 68.8% (Section 5.1).
 
-# 6. Exploratory user study (n = 5)
+# 6. End-to-end sessions and pilot with a blind user
 
-## 6.1 Participants
+## 6.1 Scripted end-to-end sessions
 
-Five blind or visually impaired adults who use a screen reader daily took part (P01–P05).
+**Purpose.** To check that each mechanism fires in the real interface and that the words a screen-reader user hears are what we claim. **This is an engineering check, not a user study.**
 
-| Participant | Vision | Years using a screen reader | Computer screen reader | Phone and screen reader | Speech rate |
-|---|---|---|---|---|---|
-| P01 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| P02 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| P03 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| P04 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| P05 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
+**Method.** A Playwright script drove the unmodified app in Chrome **keyboard-only** (Tab, Enter, typing), once per condition, through the six study tasks with brand set A in the same order. Voice mode was "My screen reader", so announcements went to the ARIA live regions a screen reader reads. Every announcement was captured from the app's spoken-output panel, and the app scored each task itself. The scripted user followed one policy: approve only a request that can be tied to a sign-in just made, and in VoiceGuard only if the code word matches. Full transcripts are in `docs/blind-user-session/`.
 
-[TO FILL FROM participant sheets: age range, how participants normally check links, prior phishing experience, use of push sign-in.]
+**Results.**
 
-## 6.2 Method
-
-- **Design.** Within-subjects, with one independent variable: **condition** (Baseline vs VoiceGuard), in two blocks. Order was counterbalanced AB/BA: **P01, P03 and P05 did Baseline first; P02 and P04 did VoiceGuard first.** Block 1 used brand set A (Northwind Bank, Contoso Pay) and block 2 brand set B (Fabrikam Bank, Tailspin Pay), so no participant saw the same email twice. The experimenter page set the condition and task order automatically.
-- **Tasks.** Six scripted tasks per block, in a reproducible random order, scored automatically from the event log:
-
-| Task | Type | What happens | Attack succeeds if |
-|---|---|---|---|
-| legit_email | Legitimate | Statement email from the real bank, then sign in | — (success = signed in) |
-| legit_login | Legitimate | Sign in to the payment app from a bookmark | — |
-| phish_typo | Phishing | "Security check" email linking to a doubled-letter look-alike | Password typed on the fake site |
-| phish_subdomain | Phishing | "Refund" email linking to `brand.com.account-verify.net` | Password typed on the fake site |
-| concurrent | Concurrent login | Participant signs in; 2.5 s later the attacker signs in from a copied device | Attacker's push approved |
-| fatigue | Push fatigue | Participant is told not to sign in; 6 attacker pushes arrive 10 s apart | Any attacker push approved |
-
-- **Session.** About **45 minutes**, shortened from the 75 minutes in our experimental plan: consent and background questions, a short familiarisation sign-in, block 1, questionnaires, block 2, questionnaires, and a debrief interview. Participants were told the study was about "how easy it is to sign in with a screen reader" and were not warned about attacks; the attacks were revealed and explained in the debrief.
-- **Apparatus.** [TO FILL: computer, screen reader and voice mode used ("My screen reader" or built-in voice); whether participants used their own phones with VoiceOver/TalkBack.] Only a study password was used; no real accounts or credentials.
-- **Consent and ethics.** Participants gave verbal informed consent after the study was explained, were told they could stop at any time and withdraw their data, and received a full debrief. No formal ethics approval was obtained for this course project. Data are identified only by participant ID.
-
-## 6.3 Measures
-
-- **Recorded automatically per task:** attack success or resistance, what the participant did (opened the link, went back from the warning, submitted the password, approved their own or the attacker's push, reported), decision time, warnings heard, spam pushes before an approval, legitimate sign-in success and time to sign in.
-- **After each block:** System Usability Scale (0–100), raw NASA-TLX (0–100) and trust ("I could tell which requests and links were safe", 1–7).
-- **Recorded by hand** (participant sheet): background, hesitations, use of Repeat / Read all, verbatim comments, technical problems, and debrief answers including which version the participant preferred.
-
-## 6.4 Analysis
-
-With five participants we report **descriptive results**: counts of successful attacks per condition, per-participant paired outcomes, medians for times and means for questionnaire scores. For completeness we give the exact McNemar test on paired outcomes (same participant, same task, both conditions), but the study is **not powered** to test our hypotheses and these p-values should not be read as confirmatory. Tasks with a technical failure were marked and excluded. The tables are produced by `node eval/study-analysis.js data/study`.
-
-## 6.5 Results
-
-**Attack success (attacks that succeeded / attempts).**
-
-| Attack | Baseline | VoiceGuard |
+| Task | Baseline | VoiceGuard |
 |---|---|---|
-| Phishing (2 tasks × 5 participants) | [TO FILL FROM study_results.md] | [TO FILL FROM study_results.md] |
-| Concurrent login | [TO FILL FROM study_results.md] | [TO FILL FROM study_results.md] |
-| Push fatigue | [TO FILL FROM study_results.md] | [TO FILL FROM study_results.md] |
-| **All attacks** | [TO FILL FROM study_results.md] | [TO FILL FROM study_results.md] |
+| legit_email | Signed in | Signed in |
+| legit_login | Signed in | Signed in |
+| phish_typo | **Attack succeeded**: opened link, typed password, approved relay push | Resisted: went back from warning, reported |
+| phish_subdomain | **Attack succeeded**: same pattern | Resisted: went back from warning, reported |
+| concurrent | **Attack succeeded**: approved the attacker's push | Resisted: approved own (COFFEE), reported attacker's (RIVER) |
+| fatigue | Resisted | Resisted; Approve locked from the 3rd request |
 
-**Paired outcomes (exploratory).**
+Attacks succeeded **3 of 4** times in Baseline and **0 of 4** with VoiceGuard, and both legitimate sign-ins succeeded in both conditions. In Baseline the fake link was read as "northwiindbank dot com" and the fake page sounded exactly like the real one; with VoiceGuard the user heard *"It has a double I, as in India, after T, H, W."* Baseline fatigue was resisted only because the script denies any request it cannot tie to its own sign-in. Its denial message ("Denied. Secure your account. Change password.") was followed ten seconds later by an identical request in the same place, which would mislead a person.
 
-| Attack | Pairs | Fooled only in Baseline | Fooled only with VoiceGuard | Fooled in both | Fooled in neither | Exact McNemar p |
-|---|---|---|---|---|---|---|
-| Phishing | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| Concurrent login | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| Push fatigue | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| All attacks | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
+Recording the sessions also exposed five problems in VoiceGuard's speech; four were fixed and one was kept on purpose (`docs/FIXES.md`).
 
-**Decision time, reporting and usability.**
+## 6.2 Pilot with a blind participant
 
-| Measure | Baseline | VoiceGuard |
+**Participant and setup.** One blind screen-reader user (P01) took part. They used a screen reader on the computer and a phone with its screen reader, connected over a phone hotspot. The protocol was the planned within-subjects design (Baseline and VoiceGuard in counterbalanced blocks, six scripted, auto-scored tasks per block); P01 was assigned Baseline first. They were told the study was about "how easy it is to sign in with a screen reader" and were not warned about attacks. Voice answering (Section 3.7) was added during the session, after the first fatigue task.
+
+**Results.** P01 completed part of the Baseline block. Two tasks gave valid results:
+
+| Task | Outcome | What happened |
 |---|---|---|
-| Median decision time, phishing | [TO FILL FROM study_results.md] | [TO FILL FROM study_results.md] |
-| Median decision time, concurrent login | [TO FILL] | [TO FILL] |
-| Median decision time, fatigue | [TO FILL] | [TO FILL] |
-| Attacks reported by the participant | [TO FILL] | [TO FILL] |
-| Legitimate sign-in success | [TO FILL] | [TO FILL] |
-| Median time to sign in | [TO FILL] | [TO FILL] |
-| SUS (0–100, higher is better) | [TO FILL] | [TO FILL] |
-| NASA-TLX raw (0–100, lower is better) | [TO FILL] | [TO FILL] |
-| Trust (1–7, higher is better) | [TO FILL] | [TO FILL] |
+| fatigue | **Attack succeeded** | After the sixth spam request, P01 pressed the voice button and said *"Yes, I'm trying to sign in"*, 44 s after that request arrived, although they had been told not to sign in |
+| legit_login | Sign-in failed | In 10 minutes P01 did not reach the payment app's bookmark; near the end they opened an unrelated email and its link |
 
-**Preference.** [TO FILL: how many of the 5 preferred VoiceGuard, Baseline or neither, and the main reasons.]
+Five further attempts were excluded: two phishing attempts interrupted by setup changes (in one, the participant typed the password on the fake site and approved the relay push before the task was stopped), and three concurrent-login attempts in which no attack was delivered, because the sign-in was not completed or the phone page had disconnected. The VoiceGuard block and the questionnaires were not reached. Voice recognition worked on the participant's own phone.
 
-**What participants said.** [TO FILL: 3–4 short verbatim quotes from the participant sheets, each tagged with the participant ID and condition, covering the phishing warning, the code word, the Approve lock, and anything that annoyed or confused them.]
+**What the pilot showed.**
 
-- "[QUOTE]" (P0_, [condition])
-- "[QUOTE]" (P0_, [condition])
-- "[QUOTE]" (P0_, [condition])
-- "[QUOTE]" (P0_, [condition])
+- **Push fatigue is real for screen-reader users.** The fatigue result is the failure *Broken Access* describes, observed with a real participant.
+- **Logistics, not the protections, cost most of the tasks.** A phone that locked and dropped its connection, campus Wi-Fi that blocked devices from reaching each other, a screen reader not yet switched on, and unfamiliar keyboard navigation. A full study needs the participant's own devices, auto-lock disabled, a private network, and a longer familiarisation.
 
-**Observations.** [TO FILL: notable behaviours from the observer notes, e.g. who used Repeat or Read all, who checked the code word, technical problems and excluded tasks.]
+## 6.3 Consent and ethics
+
+The participant gave verbal informed consent after the study was explained, was told they could stop at any time and withdraw their data, and was not warned about attacks in advance. No formal ethics approval was obtained for this course project; a full study would need it. Only fictional brands and a study password were used. Data are identified only by participant ID and kept out of the project repository. Voice recognition sends audio to the browser's speech service, which a full study must disclose in its consent form.
 
 # 7. Discussion
 
 **What we learned.**
 
-1. The paper's key phishing problem is about **audibility**, not detection. Detection algorithms for fake domains are well understood. What was missing is a way to *say* the result so a listener can act on it. Naming the exact difference with the NATO alphabet turns a 100% audio match into a clearly different message. [TO FILL: whether the study supports this, e.g. phishing success in each condition and what participants said about the NATO spelling.]
-2. For push attacks, **interface behaviour matters more than extra information**. Device and city details can be faked, and a newer push can bury an older one. The ablation shows that the code word is the only component that separates the two requests once the device is copied. [TO FILL: whether participants actually compared code words in the concurrent task.]
-3. **Fatigue protection has to act, not only warn.** A warning alone can itself be worn down. Locking approval removes the "give in to make it stop" option; in the ablation, nothing else prevents approval under spam. [TO FILL: fatigue-task outcomes and reactions to the lock.]
+1. The paper's key phishing problem is about **audibility**, not detection. Detection algorithms for fake domains are well understood. What was missing is a way to *say* the result so a listener can act on it. Naming the exact difference with the NATO alphabet turns a 100% audio match into a clearly different message. In the scripted sessions, both phishing attacks succeeded in Baseline and were stopped with VoiceGuard.
+2. For push attacks, **interface behaviour matters more than extra information**. Device and city details can be faked, and a newer push can bury an older one. The ablation shows that the code word is the only component that separates the two requests once the device is copied. Whether people compare code words in practice is still untested: the pilot's concurrent-login attempts were lost to setup problems.
+3. **Fatigue protection has to act, not only warn.** A warning alone can itself be worn down. Locking approval removes the "give in to make it stop" option; in the ablation, nothing else prevents approval under spam. The pilot participant approved the sixth spam request while saying "Yes, I'm trying to sign in", although they had been told not to sign in. That is exactly the moment the lock is built for.
 
 **Trade-offs.**
 
-- **Longer announcements.** VoiceGuard's warnings are longer (about 10 s for a full link warning and 19 s for a push at the default rate). We put the critical words first ("Warning! Look-alike link") so users can act before the end. [TO FILL: decision-time and NASA-TLX differences from the study.]
+- **Longer announcements.** VoiceGuard's warnings are longer (about 10 s for a full link warning and 19 s for a push at the default rate). We put the critical words first ("Warning! Look-alike link") so users can act before the end. The full warning is spoken once per link, with one-line reminders afterwards.
 - **False alarms.** Too many warnings would train users to ignore them. We kept a 0% false-alarm rate on the 85 legitimate sites, partly by not checking typos in very short names.
 - **Lock-out risk.** A genuine user who denies twice by accident is locked out for 5 minutes. A security key or other sign-in method should remain available.
 - **Deployment.** In practice VoiceGuard would need to be split between a screen-reader add-on (domain warnings) and the service provider (no-override pushes and code words). Our prototype shows the user experience, not that deployment.
 
 # 8. Limitations
 
-- **Small, exploratory study.** Five participants is far below the 20 in our plan. The study can show whether people *can* use VoiceGuard and how they react, but it cannot establish statistically reliable differences, and the participants are a small local sample.
-- **Shortened session and no separate pilot of the final protocol.** Sessions ran about 45 minutes instead of 75, with a short familiarisation. [CONFIRM: whether a blindfolded pilot was run.]
-- **High attack base rate.** Four of six tasks per block were attacks, far more than in real life, and participants may have become more alert after the first attack, especially in their second block. Results show whether attacks *can* be detected, not how often they would be in daily use.
+- **One human participant, one condition.** The pilot gave two valid Baseline tasks from one blind participant, and the VoiceGuard block was not reached. It shows the attacks are real for a screen-reader user, but it cannot show that VoiceGuard helps people. A within-subjects study with 20 participants, as in our plan, is needed.
+- **The end-to-end sessions use a scripted user.** They confirm that each mechanism fires and that the wording is what we claim. They cannot show whether a person understands the NATO spelling or compares code words in their head, and their timings are machine timings.
+- **Voice answering is new and partly tested.** A pressed-button voice answer worked on a real phone. Automatic listening and its echo filter were tested only with simulated recognition results.
+- **No separate pilot of the protocol.** No blindfolded pilot data was recorded, and the session with the blind participant had to serve as one.
+- **High attack base rate.** Four of six tasks per block were attacks, far more than in real life, and a participant may become more alert after the first attack. Results show whether attacks *can* be detected, not how often they would be in daily use.
 - **Modelled speech, not real screen readers.** The similarity scores in Section 5 come from a model of what a screen reader says, not from recordings of NVDA, JAWS, VoiceOver or TalkBack. The planned replication with real screen-reader audio (Phase 1b of our plan) was not carried out.
 - **Short brand names.** All four phishing misses were one-letter changes to the three-letter brand "hbl.com" (`hbbl`, `hl`, `hvl`, `hnl`). Names of three letters or fewer are deliberately not checked for single-letter typos, to avoid false alarms, so such fakes get no warning.
 - **Very slow push spam.** One push every 15 minutes or more is not detected by the fatigue rules.
@@ -427,7 +397,7 @@ With five participants we report **descriptive results**: counts of successful a
 - Stop push spam by acting on it, not only warning about it.
 - Give users enough time to listen.
 
-Our automated evaluation reproduces the paper's 100% similarity finding and shows VoiceGuard removing it: it detects 99.6% of fake domains with no false alarms and defends against concurrent-login and fatigue attacks in every simulated case. The ablation shows that each protection covers a distinct gap, with the spoken code word as the only defence once an attacker copies the victim's device. In an exploratory study with five blind screen-reader users, [TO FILL: one or two sentences on attack success, usability and preference]. A larger study, and a replication with real screen-reader recordings, are needed to confirm these results.
+Our automated evaluation reproduces the paper's 100% similarity finding and shows VoiceGuard removing it: it detects 99.6% of fake domains with no false alarms and defends against concurrent-login and fatigue attacks in every simulated case. The ablation shows that each protection covers a distinct gap, with the spoken code word as the only defence once an attacker copies the victim's device. In keyboard-only end-to-end sessions, VoiceGuard stopped every attack that succeeded under today's behaviour, without blocking normal sign-ins. A pilot with a blind participant confirmed that push fatigue works on real screen-reader users. A study with blind and visually impaired participants, and a replication with real screen-reader recordings, are needed to show that VoiceGuard helps people in practice.
 
 # Appendix A: Answers to our discussion questions
 
@@ -443,7 +413,7 @@ Our automated evaluation reproduces the paper's 100% similarity finding and show
 
 **Q12. A study of one mitigation (announcing service and device name).**
 
-- **Participants:** screen-reader users (5 in our exploratory study).
+- **Participants:** screen-reader users (20 planned; one took part in our pilot).
 - **Measures:** approval rate of concurrent attacker pushes and decision time.
 - **Analysis:** McNemar's test on paired outcomes, plus an ablation using the component switches (context announcement on vs off, code word on vs off; Section 5.3).
 - **Ethics:** accessible consent, deception kept to the minimum with a full debrief, no real credentials, and anonymised data.
@@ -461,9 +431,10 @@ Our automated evaluation reproduces the paper's 100% similarity finding and show
 
 | Planned | What we did |
 |---|---|
-| 20 blind and visually impaired participants (minimum 12) | 5 participants, reported as exploratory |
-| 75-minute sessions | About 45 minutes |
+| 20 blind and visually impaired participants (minimum 12) | One blind participant, Baseline block only, reported as a pilot; plus scripted keyboard-only sessions in both conditions |
+| 75-minute sessions | One partial session |
 | IBA ethics approval before recruiting | Verbal informed consent and debrief; no formal approval |
 | Phase 1b: recordings of real screen readers | Not carried out; similarity scores use modelled speech |
-| Phase 2: blindfolded pilot with 6–8 people | [CONFIRM] |
+| Phase 2: blindfolded pilot with 6–8 people | Not recorded |
 | Ablation in Phase 1 | Done for the push guard (Section 5.3) |
+| Button-only answers on the phone | Voice answers added during the pilot (Section 3.7) |
