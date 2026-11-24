@@ -41,7 +41,18 @@ Sign-in security now depends on details people check by eye. A sighted user can 
 
 Akanda, Mahdad and Saxena's \emph{Broken Access}~\cite{brokenaccess} measured this gap. Using their AWARE framework, they found that every deployed two-factor and passwordless method had an accessibility gap, a security gap, or both. Their discussion recommends fixes in one paragraph: a phishing detector inside the screen reader, announcing the requesting service, a detector for repeated notifications, and expiry windows long enough for speech. They do not build or test any of them.
 
-We build and test them. Our premise is that all three attacks we target exploit the \emph{voice channel}: what is spoken, when, and what is left out. VoiceGuard therefore fixes what the user hears, not only what the system detects. Our contributions are:
+We build and test them. Our premise is that all three attacks we target exploit the \emph{voice channel}: what is spoken, when, and what is left out. VoiceGuard therefore fixes what the user hears, not only what the system detects.
+
+\textbf{Objective.} The objective of this experiment is to build VoiceGuard and test whether it makes phishing, concurrent-login and push-fatigue attacks detectable by ear for screen-reader users, without making normal sign-in harder. We ask five research questions:
+\begin{itemize}
+\item \textbf{RQ1:} Does VoiceGuard reduce phishing success?
+\item \textbf{RQ2:} Does it reduce approval of a concurrent attacker push?
+\item \textbf{RQ3:} Does it reduce acceptance of push spam (fatigue)?
+\item \textbf{RQ4:} What does the protection cost in usability (sign-in success and time, SUS, NASA-TLX)?
+\item \textbf{RQ5:} Does it make look-alike domains \emph{audibly} different, measured with AWARE's similarity metric?
+\end{itemize}
+
+Our contributions are:
 \begin{enumerate}
 \item \textbf{VoiceGuard}, with a domain guard for phishing and a push guard for concurrent-login and push-fatigue attacks, plus voice answering on the phone.
 \item \textbf{A study environment}: simulated computer and phone, an attacker console, and an experimenter console for counterbalanced, auto-scored sessions.
@@ -180,6 +191,30 @@ fatigue & Told not to sign in; 6 attacker pushes, 10\,s apart (any approved) \\
 \end{table}
 
 %======================================================================
+\section{Data Collection}
+
+Table~\ref{tab:data} lists everything collected. \textbf{One human participant} took part (P01, blind, daily screen-reader user). The scripted user in stage~3 is a program, not a participant. All other data come from generated stimuli and replayed attack schedules.
+
+\begin{table*}[t]
+\caption{Data collected in each stage}
+\label{tab:data}
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}p{3.2cm}p{4.6cm}X@{}}
+\toprule
+Stage & Amount & What was recorded \\
+\midrule
+1 Automated phishing & 1,114 look-alikes of 50 brands (9 techniques); 85 legitimate sites & Detection verdict and named target; spoken rendering today and with VoiceGuard; TF-IDF similarity; speaking time \\
+2 Push replay and ablation & 7 races $\times$ 2 device conditions; 12 fatigue schedules; 5 speech rates; normal sign-ins; 8 configurations & Pushes shown, warnings raised, Approve lock, whether the two pushes sound different, expiry window \\
+3 Scripted sessions & 1 scripted user $\times$ 2 conditions $\times$ 6 tasks = 12 task runs & Every announcement (spoken-output transcript), focus moves, actions, app-scored outcome per task \\
+4 Pilot & 1 blind participant; 7 task attempts in the Baseline block, 2 valid and 5 excluded & Time-stamped event log (sign-ins, pushes, decisions, voice commands), app-scored outcome, decision time, observer notes \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Not collected:} the pilot's VoiceGuard block, SUS, NASA-TLX and trust questionnaires, and the debrief interview.} \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+%======================================================================
 \section{Results}
 
 \subsection{Phishing: Fakes Become Audibly Different}
@@ -314,6 +349,25 @@ The pilot participant gave verbal informed consent, was told they could stop at 
 
 %======================================================================
 \section{Conclusion and Future Work}
+
+\textbf{Were the objectives achieved?} Partly (Table~\ref{tab:achieved}). The system-level objectives were met: VoiceGuard makes all three attacks audible and stops them in automated and scripted tests (RQ1--RQ3, RQ5). The human-level objective was not: with one participant who did not reach the VoiceGuard block, we cannot yet show that VoiceGuard helps people or what it costs them in usability (RQ4).
+
+\begin{table}[t]
+\caption{Research questions and outcome}
+\label{tab:achieved}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}p{0.75cm}p{1.15cm}X@{}}
+\toprule
+RQ & Status & Evidence \\
+\midrule
+RQ1 & Partly & 99.6\% of fakes detected; scripted phishing 2/2 succeeded in Baseline, 0/2 with VoiceGuard; not tested with people \\
+RQ2 & Partly & Every replayed race caught; code word separates spoofed pushes (ablation); scripted attack stopped; pilot attempts excluded \\
+RQ3 & Partly & Approve locked by the 3rd push in 12/12 schedules; pilot confirms the problem (P01 approved the 6th spam push in Baseline); VoiceGuard not tested with people \\
+RQ4 & Not yet & Scripted legitimate sign-ins succeed in both conditions; no human usability data \\
+RQ5 & Achieved & 100\% to 60.4\% similarity for the paper's pair; fakes that sound identical fall from 21.4\% to 0\% (modelled speech) \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \emph{Broken Access} showed that sign-in security fails screen-reader users through the audio channel. VoiceGuard shows this can be fixed by changing what is said: name exactly how a fake site differs, never let one push hide another, tie each push to the user's sign-in with a spoken code word, act on push spam instead of only warning, and give users time to listen. Our evaluation reproduces the paper's 100\% similarity finding and removes it, detecting 99.6\% of 1,114 fakes with no false alarms; the ablation shows each protection closes a distinct gap; end-to-end sessions show VoiceGuard stopping every attack that succeeded under today's behaviour without blocking normal sign-ins; and a pilot confirmed push fatigue on a real screen-reader user. Next steps are a counterbalanced study with 20 blind and visually impaired participants after ethics approval, replication with recorded screen-reader audio, an NVDA add-on for real browsing, and service-side support for no-override pushes and spoken code words.
 
